@@ -1,0 +1,392 @@
+/* CapstoneFlow: giao diện dễ dùng, đồng bộ theo các trang học vụ. */
+:root { --navy:#15354c; --navy-dark:#0f2a3d; --blue:#176b85; --blue-light:#eaf3f4; --cyan:#1b8b92; --accent:#176b85; --ink:#20313d; --muted:#596a78; --page:#f3f6f6; --border:#dce5e7; --radius:6px; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; min-height:100vh; font:17px/1.62 Arial,"Helvetica Neue",Helvetica,sans-serif; background:#f3f6f6; color:#20313d; }
+h1,h2,h3,p { margin-top:0; }
+h1,h2,h3 { line-height:1.35; letter-spacing: normal; font-weight: 700; }
+h1 { font-size:2rem; } h2 { font-size:1.3rem; } h3 { font-size:1.05rem; }
+p { color:#4e5c69; }
+a { color:inherit; text-decoration:none; } a:hover { color:#10526b; }
+button,input,select,textarea { font:inherit; }
+button { cursor:pointer; } button:disabled { opacity:.65; cursor:wait; }
+input,select,textarea { display:block; width:100%; min-width:0; border:1px solid #bfcbd7; border-radius:4px; padding:10px 12px; background:#fff; color:#20313d; }
+textarea { resize:vertical; }
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible { outline:2px solid #176bb4; outline-offset:2px; }
+label { display:block; font-size: 1rem; font-weight:600; }
+label input,label select,label textarea { margin-top:7px; font-weight:400; }
+.button,button:not(.text-button),.small-button { background:#176b85; color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid #176b85; border-radius:4px; padding:10px 16px; font-weight:600; line-height:1.45; }
+.button:hover,button:not(.text-button):hover,.small-button:hover { color:#fff; background:#15354c; border-color:#15354c; }
+.button.outline,button.outline,.small-button.outline { background:#fff; color:#176b85; border-color:#aebfca; }
+.button.outline:hover,button.outline:hover,.small-button.outline:hover { color:#15354c; background:#eaf4fa; }
+.container { width:min(100%,1170px); padding-inline:24px; margin-inline:auto; }
+.section-space { padding-block:50px; }
+.muted,.help-text,.help-inline { color:#677986; }
+.help-text,.help-inline { font-size: .875rem; font-weight:400; }
+.small-text { font-size: .875rem; } .pre-line { white-space:pre-line; overflow-wrap:anywhere; }
+.text-link,.back-link { color:#176b85; font-weight:600; }
+.text-link:hover,.back-link:hover { text-decoration:underline; }
+.text-button { background:transparent; border:0; padding:0; color:#176b85; font-size: 1rem; font-weight:600; }
+.text-button:hover { text-decoration:underline; }
+.text-button.danger { color:#ae3737; }
+.eyebrow { margin-bottom:10px; color:#176b85; font-size: .875rem; font-weight:600; }
+.page-heading,.section-heading { margin-bottom:22px; }
+.section-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; padding-bottom:15px; border-bottom:1px solid #e1e8e9; }
+.section-heading h1,.page-heading h1 { margin-bottom:7px; }
+.section-heading p,.page-heading p { margin-bottom:0; font-size: 1rem; }
+.notice { color:#34536a; background:#edf7fc; border-left:3px solid #5ba3ce; padding:13px 16px; font-size: 1rem; }
+.notice.error { color:#953e3c; background:#fff1f0; border-left-color:#b65650; }
+.notice.success { color:#275f42; background:#ecf8ef; border-left-color:#4a9468; }
+.empty-state { padding:28px 18px; color:#647582; background:#f8fafc; border:1px solid #e1e8e9; text-align:center; }
+.empty-state a { color:#176b85; }
+.status-badge { display:inline-flex; white-space:nowrap; padding:2px 8px; border:1px solid #d8e0e7; border-radius:3px; background:#f5f7f8; color:#667583; font-size: .875rem; font-weight:500; }
+.status-badge.open { border-color:#c6e1d3; background:#e9f5ee; color:#206f4c; }
+.status-badge.closed { border-color:#e0e3e6; background:#f1f2f4; color:#687580; }
+.stack { display:flex; flex-direction:column; gap:17px; }
+.stack > h2 { margin-bottom:0; } .stack > p { margin:-8px 0 0; }
+.form-two-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.form-actions { display:flex; gap:10px; margin-top:6px; }
+.registration-form button[type=submit] { width:100%; }
+.editor-form,.content-panel,.form-panel { background:#fff; border:1px solid #dce5e7; border-radius:4px; padding:24px; }
+.table-scroll { width:100%; background:#fff; border:1px solid #e1e8e9; overflow-x:auto; border-radius:4px; }
+.data-table { width:100%; min-width:690px; border-collapse:collapse; }
+.data-table th { color:#4b5b68; background:#f4f7f9; padding:12px 13px; text-align:left; font-size: 1rem; font-weight:600; }
+.data-table td { padding:13px; border-top:1px solid #e1e8e9; vertical-align:top; font-size: 1rem; }
+.data-table tr:hover td { background:#fafcfd; }
+.data-table td a { color:#176b85; }
+.table-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.note-text { max-width:320px; white-space:pre-line; overflow-wrap:anywhere; margin-top:7px; }
+.button-full { width:100%; }
+@media (max-width:650px) { .form-two-columns { grid-template-columns:1fr; } .section-heading { align-items:flex-start; flex-wrap:wrap; } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
+
+/* Các trang tra cứu và giảng viên dùng chung token, nhưng không sao chép bố cục Moodle. */
+
+/* Header màu xanh đơn, menu có gạch dưới như các cổng học vụ */
+.portal-header { background: #15354c; color: #fff; }
+.portal-header-inner { width: min(100% - 64px, 1340px); margin-inline: auto; display: flex; align-items: stretch; gap: 26px; min-height: 66px; }
+.portal-brand { color: #fff; flex: none; display: inline-flex; align-items: center; gap: 10px; font-size: 1.23rem; font-weight: 700; white-space: nowrap; }
+.portal-brand:hover { color: #fff; }
+.portal-header-logo { display: block; width: 176px; height: 46px; object-fit: contain; object-position: left center; filter: brightness(0) invert(1); }
+.portal-brand:focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 2px; }
+.portal-brand-icon { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 3px; background: #fff; color: #15354c; font-weight: 800; font-size: 1rem; letter-spacing: -.045em; }
+.portal-menu { display: flex; align-items: stretch; gap: 4px; margin-left: 8px; }
+.portal-menu a { display: inline-flex; align-items: center; color: #fff; padding: 4px 13px 0; border-bottom: 3px solid transparent; font-weight: 400; white-space: nowrap; }
+.portal-menu a:hover, .portal-menu a.active { color: #fff; border-bottom-color: #dceeff; background: rgb(255 255 255 / 7%); }
+.portal-login-link { color: #fff; display: inline-flex; align-items: center; gap: 9px; padding: 0 4px; margin-left: auto; white-space: nowrap; font-size: 1rem; }
+.portal-login-link:hover { color: #fff; text-decoration: underline; }
+
+/* Khung nội dung trắng trên nền xanh nhạt */
+.portal-page-wrap { width: min(100% - 56px, 1280px); margin: 26px auto 34px; }
+.portal-paper { background: #fff; border: 1px solid #dfe6e9; border-radius: 9px; padding: 34px 38px 44px; min-height: 450px; }
+.portal-paper h1 { font-size: clamp(1.7rem, 2.6vw, 2.15rem); line-height: 1.3; color: #1f2730; margin: 0 0 10px; }
+.portal-paper h2 { font-size: 1.27rem; color: #1f2831; margin: 0; }
+.portal-subtitle { display: inline-block; font-size: .875rem; color: #677986; margin-bottom: 9px; }
+.portal-welcome > p { max-width: 800px; margin: 0 0 27px; color: #56636f; }
+.portal-home-search { padding: 18px 20px; border: 1px solid #dfe7e9; background: #f8fafb; border-radius: 5px; }
+.portal-home-search label { display: block; font-size: 1rem; margin-bottom: 8px; }
+.portal-search-fields { display: flex; max-width: 820px; gap: 9px; }
+.portal-search-fields input { flex: 1; width: auto; border-radius: 4px; min-height: 44px; }
+.portal-search-fields button { min-width: 116px; }
+.portal-home-search p { color: #6a7885; font-size: .875rem; margin: 8px 0 0; }
+.portal-simple-metrics { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 22px 0 27px; color: #66727c; font-size: .875rem; }
+.portal-simple-metrics strong { color: #253342; font-size: 1rem; }
+.portal-simple-metrics span + span::before { content: "•"; margin-right: 22px; color: #91a3ae; }
+.portal-home-columns { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 34px; }
+.portal-home-main { min-width: 0; }
+.portal-section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; border-bottom: 2px solid #e0e7ec; padding-bottom: 12px; margin-bottom: 0; }
+.portal-section-head a { color: #176b85; font-size: 1rem; white-space: nowrap; }
+.portal-section-head a:hover { text-decoration: underline; }
+.portal-topic-list { background: #fff; }
+.portal-topic-row { display: flex; justify-content: space-between; gap: 22px; align-items: center; border-bottom: 1px solid #e1e8e9; padding: 18px 6px; }
+.portal-topic-row:last-child { border-bottom: 0; }
+.portal-topic-body { min-width: 0; }
+.portal-topic-title { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; margin-bottom: 5px; }
+.portal-topic-title a { color: #176b85; font-size: 1.01rem; line-height: 1.45; }
+.portal-topic-title a:hover { text-decoration: underline; }
+.portal-topic-excerpt { font-size: 1rem; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 4px 0 7px; color: #4f5d68; }
+.portal-topic-meta { display: flex; gap: 3px 15px; flex-wrap: wrap; font-size: .875rem; color: #677784; }
+.portal-topic-meta strong { font-weight: 600; color: #354758; }
+.portal-topic-tech { font-size: .875rem; margin-top: 4px; color: #697887; }
+.portal-topic-action { color: #176b85; font-size: .875rem; white-space: nowrap; flex-shrink: 0; }
+.portal-topic-action:hover { text-decoration: underline; }
+.portal-home-aside { background: #f6f9f9; padding: 16px 19px; border: 1px solid #e0e7ec; align-self: start; border-radius: 4px; }
+.portal-home-aside h2 { font-size: 1.08rem; margin: 0 0 13px; }
+.portal-home-aside h3 { font-size: 1rem; margin: 0 0 10px; }
+.portal-home-aside p { font-size: .875rem; margin-bottom: 12px; line-height: 1.65; }
+.portal-home-aside a { display: inline-block; color: #176b85; font-size: .875rem; }
+.portal-home-aside a:hover { text-decoration: underline; }
+.portal-home-aside hr { border: none; border-top: 1px solid #e1e8ed; margin: 20px 0 17px; }
+.portal-empty, .portal-loading { padding: 26px 8px; color: #697782; }
+
+/* Kho đề tài và trang chi tiết */
+.portal-inner-page { padding-top: 28px; }
+.portal-breadcrumb { display: flex; flex-wrap: wrap; gap: 9px; color: #657887; font-size: .875rem; margin-bottom: 22px; }
+.portal-breadcrumb a { color: #176b85; }
+.portal-page-description { max-width: 830px; margin-bottom: 25px; color: #5a6874; }
+.portal-filter-panel { background: #f8fafb; border: 1px solid #dfe7e9; border-radius: 4px; padding: 17px 19px; }
+.portal-filter-fields { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr) minmax(0,.7fr); gap: 14px; }
+.portal-filter-fields label { font-size: .875rem; }
+.portal-filter-fields input, .portal-filter-fields select { margin-top: 6px; font-size: 1rem; min-height: 44px; }
+.portal-clear-filter { margin-top: 13px; }
+.portal-list-heading { color: #4e5d69; font-size: .875rem; margin: 21px 0 3px; padding-bottom: 7px; border-bottom: 1px solid #e1e8e9; }
+.portal-inner-page > .portal-topic-list .portal-topic-row { padding-inline: 7px; }
+.portal-text-page { max-width: none; }
+.portal-text-page > p, .portal-text-page > ol { max-width: 880px; }
+.portal-text-page h2 { margin: 30px 0 13px; }
+.portal-text-page ol { padding-left: 25px; line-height: 1.9; }
+.portal-text-page a:not(.button) { color: #176b85; }
+.portal-note-simple { background: #eef7fc; border-left: 3px solid #5ba3ce; color: #34536a; max-width: 900px; padding: 12px 16px; font-size: 1rem; }
+.portal-text-page > .button { margin-top: 8px; }
+.portal-detail-heading { border-bottom: 1px solid #e1e8e9; padding-bottom: 15px; margin-bottom: 25px; }
+.portal-detail-heading h1 { margin-top: 12px; max-width: 1000px; }
+.portal-detail-heading p { margin: 0; font-size: .875rem; }
+.portal-detail-columns { display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.75fr); gap: 35px; align-items: start; }
+.portal-detail-info h2 { font-size: 1.12rem; margin: 0 0 9px; }
+.portal-detail-info p + h2 { margin-top: 24px; border-top: 1px solid #e3e8ed; padding-top: 20px; }
+.portal-detail-info p { font-size: 1rem; }
+.portal-detail-form { border: 1px solid #dbe3e9; padding: 23px; border-radius: 4px; }
+.portal-detail-form h2 { font-size: 1.2rem; }
+.portal-detail-form .stack { gap: 15px; }
+.portal-detail-form .stack > p { margin: -7px 0 0; }
+.portal-detail-form label { font-size: .875rem; }
+.portal-detail-form .registration-form button[type="submit"] { width: 100%; }
+
+/* Dashboard: thanh menu ngang và dữ liệu dạng bảng, không dùng sidebar trang trí */
+.lecturer-layout { display: block; min-height: 100vh; }
+.lecturer-portal-header .portal-header-inner { width: min(100% - 54px, 1280px); }
+.portal-lecturer-user { display: flex; align-items: center; gap: 14px; margin-left: auto; min-width: 0; }
+.portal-lecturer-user > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; color: #fff; font-size: .875rem; }
+.portal-lecturer-user button:not(.text-button) { background: transparent; border: 1px solid #7c9cb9; padding: 6px 10px; color: #fff; font-size: .875rem; white-space: nowrap; }
+.portal-lecturer-user button:not(.text-button):hover { background: #215c96; border-color: #fff; }
+.lecturer-main { background: #fff; width: min(100% - 56px, 1280px); min-height: calc(100vh - 114px); margin: 26px auto 34px; border: 1px solid #dfe6e9; border-radius: 9px; padding: 35px 38px 48px; }
+.lecturer-main h1 { font-size: 1.9rem; color: #1f2730; font-weight: 600; }
+.lecturer-main .eyebrow { display: none; }
+.lecturer-main .section-heading { margin-bottom: 19px; }
+.lecturer-main .section-heading h1 { font-size: 1.9rem; }
+.lecturer-main .page-heading { margin-bottom: 22px; }
+.lecturer-main .page-heading p { margin: 8px 0 0; }
+.lecturer-main .content-panel, .lecturer-main .editor-form { border-color: #dfe5ea; }
+.lecturer-main .editor-form { max-width: 780px; }
+.portal-dashboard-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid #e0e7ec; }
+.portal-dashboard-heading h1 { margin-bottom: 6px; }
+.portal-dashboard-heading p { margin: 0; font-size: 1rem; }
+.portal-dashboard-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border: 1px solid #e1e8e9; border-radius: 4px; margin: 24px 0 32px; }
+.portal-dashboard-stats > div { display: flex; flex-direction: column; padding: 19px 22px; border-right: 1px solid #e1e8e9; }
+.portal-dashboard-stats > div:last-child { border-right: none; }
+.portal-dashboard-stats span { color: #596b7a; font-size: .875rem; }
+.portal-dashboard-stats strong { font-size: 1.72rem; margin-top: 6px; font-weight: 600; color: #15354c; }
+.portal-dashboard-section { margin-top: 23px; }
+.portal-dashboard-section .portal-section-head { margin-bottom: 15px; }
+.portal-dashboard-bottom { display: flex; gap: 25px; flex-wrap: wrap; margin-top: 23px; }
+.portal-dashboard-bottom a { color: #176b85; font-size: 1rem; }
+.portal-dashboard-bottom a:hover { text-decoration: underline; }
+.data-table th { font-size: 1rem; letter-spacing: 0; font-weight: 600; background: #f4f7f9; }
+.data-table td { font-size: 1rem; }
+.table-scroll { border-color: #e1e8e9; }
+
+/* Đăng nhập: bố cục cổng học vụ, form thật; không mô phỏng SSO của trường. */
+.portal-login-page { min-height: 100vh; background: #f3f6f6; }
+.portal-login-header { justify-content: space-between; }
+.portal-login-shell { max-width: 980px; width: min(100% - 40px, 980px); margin: 58px auto 0; }
+.portal-login-card { background: #fff; border: 1px solid #dfe6e9; border-radius: 8px; overflow: hidden; }
+.portal-login-heading { padding: 29px 36px 20px; border-bottom: 1px solid #e3e9ea; }
+.portal-login-heading h1 { font-size: 1.75rem; margin: 0 0 6px; }
+.portal-login-heading p { margin: 0; font-size: 1rem; }
+.portal-login-columns { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(260px,1fr); }
+.portal-login-form { padding: 28px 36px 34px; }
+.portal-login-form h2 { font-size: 1.13rem; margin: 0 0 16px; }
+.portal-login-form label { display: block; font-size: 1rem; margin: 18px 0 7px; }
+.portal-login-form input { min-height: 45px; margin-top: 0; }
+.portal-login-form .notice { margin-top: 16px; }
+.portal-login-form button[type="submit"] { margin-top: 23px; display: flex; width: 100%; }
+.portal-login-info { border-left: 1px solid #e3e9ea; background: #fafcfd; padding: 28px 35px; }
+.portal-login-info h2 { font-size: 1.13rem; margin: 0 0 15px; }
+.portal-login-info h3 { font-size: 1rem; margin: 0 0 10px; }
+.portal-login-info p { font-size: 1rem; line-height: 1.8; margin-bottom: 15px; }
+.portal-login-info a { color: #176b85; font-size: 1rem; }
+.portal-login-info a:hover { text-decoration: underline; }
+.portal-login-info-divider { height: 1px; background: #dfe7ed; margin: 23px 0; }
+.portal-login-footer { max-width: 680px; margin: 17px auto 30px; text-align: center; font-size: .875rem; color: #5a6c7b; }
+@media (max-width: 760px) {
+  .portal-login-shell { margin-top: 20px; width: min(100% - 24px, 980px); }
+  .portal-login-columns { grid-template-columns: minmax(0,1fr); }
+  .portal-login-heading { padding: 25px 22px 20px; }
+  .portal-login-form { padding: 22px; }
+  .portal-login-info { border-left: 0; border-top: 1px solid #e3e9ea; padding: 23px 22px; }
+}
+/* Footer nhẹ, không lặp lại các khối quảng bá */
+.portal-footer { color: #4d5f70; font-size: .875rem; background: transparent; }
+.portal-footer-inner { max-width: 1280px; width: min(100% - 56px, 1280px); margin: 0 auto 32px; display: flex; justify-content: space-between; gap: 30px; }
+.portal-footer strong { color: #304252; font-size: 1rem; }
+.portal-footer p { margin: 5px 0; color: #667583; max-width: 600px; font-size: .875rem; }
+.portal-footer .portal-disclaimer { font-size: .875rem; }
+.portal-footer-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 17px; max-width: 365px; }
+.portal-footer-actions a { color: #176b85; }
+.portal-footer-actions small { flex-basis: 100%; text-align: right; color: #6b7b88; }
+.portal-faculty-logo { display: block; width: 100px; max-height: 38px; object-fit: contain; }
+
+@media (max-width: 1020px) {
+  .portal-home-columns { grid-template-columns: minmax(0,1fr) 235px; gap: 24px; }
+  .portal-header-inner { gap: 10px; width: min(100% - 36px, 1340px); }
+  .portal-menu { margin-left: 0; }
+  .portal-menu a { padding-inline: 10px; }
+  .portal-brand { font-size: 1.1rem; }
+  .portal-lecturer-user > span { display: none; }
+}
+@media (max-width: 760px) {
+  .portal-page-wrap, .portal-footer-inner { width: min(100% - 24px,1280px); margin-top: 13px; }
+  .portal-paper, .lecturer-main { padding: 24px 18px 29px; border-radius: 6px; }
+  .portal-home-columns, .portal-detail-columns { grid-template-columns: minmax(0,1fr); gap: 25px; }
+  .portal-simple-metrics { margin-bottom: 23px; }
+  .portal-home-aside { margin-top: 2px; }
+  .portal-filter-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .portal-filter-fields label:last-child { grid-column: 1 / -1; }
+  .portal-header-inner, .lecturer-portal-header .portal-header-inner { width: min(100% - 24px,1340px); flex-wrap: wrap; align-items: center; gap: 0; padding-top: 8px; }
+  .portal-brand { height: 42px; }
+  .portal-login-link, .portal-lecturer-user { margin-left: auto; }
+  .portal-menu { order: 3; width: 100%; overflow-x: auto; min-height: 44px; }
+  .portal-menu a { padding-top: 0; font-size: 1rem; }
+  .lecturer-main { width: min(100% - 24px,1280px); margin: 13px auto 25px; }
+  .portal-dashboard-stats { grid-template-columns: repeat(2,1fr); }
+  .portal-dashboard-stats > div:nth-child(2) { border-right: 0; }
+  .portal-dashboard-stats > div:nth-child(-n+2) { border-bottom: 1px solid #e1e8e9; }
+  .portal-footer-inner { display: block; margin-bottom: 25px; }
+  .portal-footer-actions { max-width: none; margin-top: 14px; justify-content: flex-start; }
+  .portal-footer-actions small { text-align: left; }
+}
+@media (max-width: 510px) {
+  .portal-header-inner { min-height: 0; }
+  .portal-brand { font-size: 1.08rem; }
+  .portal-brand-icon { width: 31px; height: 31px; font-size: .875rem; }
+  .portal-login-link { font-size: 1rem; }
+  .portal-search-fields { display: block; }
+  .portal-search-fields input { width: 100%; }
+  .portal-search-fields button { margin-top: 9px; width: 100%; }
+  .portal-paper h1 { font-size: 1.65rem; }
+  .portal-topic-row { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .portal-topic-action { align-self: flex-end; }
+  .portal-topic-meta { display: block; }
+  .portal-topic-meta span { display: block; margin-top: 3px; }
+  .portal-filter-fields { grid-template-columns: 1fr; }
+  .portal-filter-fields label:last-child { grid-column: auto; }
+  .portal-dashboard-heading { display: block; }
+  .portal-dashboard-heading .button { margin-top: 15px; }
+  .portal-dashboard-stats > div { padding: 16px 14px; }
+  .portal-login-heading h1 { font-size: 1.55rem; }
+  .portal-lecturer-user button:not(.text-button) { padding: 5px 6px; }
+}
+
+/* Bảng tổng quan thành hàng thông tin khi xem trên điện thoại. */
+@media (max-width: 600px) {
+  .portal-simple-metrics span + span::before { display: none; }
+  .portal-simple-metrics { gap: 7px 15px; }
+  .portal-dashboard-section .data-table { min-width: 0; }
+  .portal-dashboard-section .data-table thead { display: none; }
+  .portal-dashboard-section .data-table tbody tr { display: block; border-bottom: 1px solid #e1e8e9; padding: 10px 11px; }
+  .portal-dashboard-section .data-table tbody tr:last-child { border-bottom: 0; }
+  .portal-dashboard-section .data-table td { display: block; border: 0; padding: 4px 0; overflow-wrap: anywhere;  font-size: 1rem;}
+  .portal-dashboard-section .data-table td:nth-child(2)::before { content: "Đề tài: "; font-weight: 600; }
+  .portal-dashboard-section .data-table td:nth-child(3)::before { content: "Ngày gửi: "; font-weight: 600; }
+  .portal-dashboard-section .data-table td:nth-child(4)::before { content: "Trạng thái: "; font-weight: 600; }
+}
+
+/* Thanh công cụ Moodle-style: tìm kiếm, thông báo và hộp thư.
+   Màu trắng/xanh, đường viền mảnh, không shadow hoặc gradient trang trí. */
+.portal-header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.portal-header-actions .portal-login-link { margin-left: 8px; }
+.portal-tool { position: relative; display: inline-flex; align-items: center; }
+.portal-activity-toolbar { position: relative; display: flex; align-items: center; gap: 4px; padding-left: 10px; border-left: 1px solid rgba(255,255,255,.27); }
+.portal-header-actions .portal-lecturer-user { margin-left: 8px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,.27); }
+button.portal-icon-button { position: relative; color: #fff; background: transparent; border: 1px solid transparent; border-radius: 4px; width: 42px; height: 42px; padding: 0; display: inline-flex; justify-content: center; align-items: center; }
+button.portal-icon-button:hover, button.portal-icon-button.is-open { background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.17); }
+.portal-count { position: absolute; top: -3px; right: -4px; font-size: .875rem; line-height: 1.6; min-width: 18px; padding: 0 4px; border-radius: 10px; background: #c93e30; color: #fff; font-weight: 700; text-align: center; }
+.portal-toolbar-panel { position: absolute; top: calc(100% + 11px); right: 0; z-index: 100; width: min(390px, calc(100vw - 24px)); background: #fff; color: #20313d; border: 1px solid #cbd6df; border-radius: 5px; box-shadow: 0 7px 22px rgba(18,45,71,.13); overflow: hidden; font-size: 1rem; }
+.portal-activity-panel { width: min(420px, calc(100vw - 24px)); }
+.portal-panel-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #e2e8ed; background: #f8fafb; }
+.portal-panel-title strong { color: #243442; font-size: 1rem; font-weight: 600; }
+.portal-panel-title span { display: block; color: #667888; font-size: .875rem; margin-top: 3px; }
+button.portal-panel-close { background: transparent; border: 0; padding: 5px; height: 28px; width: 28px; border-radius: 3px; color: #576775; flex-shrink: 0; }
+button.portal-panel-close:hover { background: #e6edf2; color: #233442; }
+.portal-panel-feed { max-height: 360px; overflow-y: auto; overscroll-behavior: contain; }
+a.portal-feed-row, button.portal-feed-row { display: block; width: 100%; text-align: left; padding: 12px 15px; background: #fff; border: 0; border-bottom: 1px solid #e6ebef; color: #273846; border-radius: 0; font-weight: 400; line-height: 1.45; }
+a.portal-feed-row:hover, button.portal-feed-row:hover { background: #f4f8fb; color: #273846; }
+a.portal-feed-row.unread, button.portal-feed-row.unread { background: #eff7fc; }
+.portal-feed-title { display: block; font-size: .875rem; overflow-wrap: anywhere; }
+.portal-feed-title strong { font-weight: 600; }
+.portal-feed-description { display: block; font-size: .875rem; color: #5e6e79; margin: 3px 0; overflow-wrap: anywhere; }
+.portal-message-preview { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.portal-feed-date { display: block; color: #7b8993; font-size: .875rem; margin-top: 5px; }
+.portal-unread-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0876c0; margin-right: 7px; vertical-align: 1px; }
+.portal-panel-empty, .portal-panel-error { color: #5e6e79; font-size: .875rem; padding: 18px 15px; margin: 0; }
+.portal-panel-error { color: #a33835; background: #fff5f4; padding: 10px 15px; }
+button.portal-mark-all { display: block; width: 100%; border: 0; border-bottom: 1px solid #e2e8ed; border-radius: 0; background: #f6f9f9; color: #075ca0; font-size: .875rem; padding: 10px 15px; font-weight: 600; }
+button.portal-mark-all:hover { background: #ebf3f9; color: #15354c; }
+.portal-panel-footer { display: block; background: #f8fafb; color: #176b85; text-align: center; padding: 12px 15px; font-size: .875rem; font-weight: 600; }
+.portal-panel-footer:hover { color: #15354c; background: #f0f5f8; }
+.portal-toolbar-search-form { padding: 16px; }
+.portal-toolbar-search-form label { margin: 0 0 8px; font-size: .875rem; }
+.portal-toolbar-search-form > div { display: flex; gap: 8px; }
+.portal-toolbar-search-form input { min-width: 0; flex: 1; }
+.portal-toolbar-search-form button { padding-inline: 14px; }
+.portal-lecturer-search, .portal-inbox-toolbar { display: flex; align-items: center; gap: 12px; margin: 0 0 19px; }
+.portal-lecturer-search label, .portal-inbox-toolbar label { flex-shrink: 0; font-weight: 600; font-size: .875rem; }
+.portal-lecturer-search input, .portal-inbox-toolbar input { max-width: 430px; }
+
+/* Hộp thư: lời nhắn từ form quan tâm, không phải chat hai chiều. */
+.portal-inbox-list { border: 1px solid #dce5e7; border-radius: 5px; }
+.portal-inbox-item { border-bottom: 1px solid #e4eaee; scroll-margin-top: 80px; }
+.portal-inbox-item:last-child { border-bottom: 0; }
+.portal-inbox-item.unread .portal-inbox-summary { background: #f3f9fd; }
+button.portal-inbox-summary { color: #263543; display: block; width: 100%; text-align: left; background: #fff; border: 0; border-radius: 0; padding: 16px 18px; font-weight: 400; }
+button.portal-inbox-summary:hover { color: #263543; background: #f5f9fc; }
+.portal-inbox-author { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+.portal-inbox-author strong { font-size: 1rem; }
+.portal-inbox-time { color: #7b8792; margin-left: auto; font-size: .875rem; }
+.portal-inbox-topic { display: block; color: #176b85; margin: 6px 0 2px; font-size: .875rem; }
+.portal-inbox-excerpt { display: block; color: #62717c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .875rem; }
+.portal-inbox-chevron { display: block; text-align: right; color: #176b85; font-size: .875rem; margin-top: 3px; }
+.portal-inbox-detail { padding: 16px 18px 20px; border-top: 1px solid #e4eaee; background: #fff; }
+.portal-inbox-message { white-space: pre-wrap; overflow-wrap: anywhere; color: #273846; line-height: 1.75; margin: 0 0 16px; }
+.portal-inbox-contacts { display: flex; gap: 6px 24px; flex-wrap: wrap; color: #52616f; font-size: .875rem; margin-bottom: 16px; }
+.portal-inbox-contacts a { color: #176b85; }
+.portal-inbox-actions { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; }
+.portal-inbox-actions .button, .portal-inbox-actions button { font-size: .875rem; padding: 8px 12px; }
+.portal-inbox .help-text { margin-top: 14px; }
+tr[id^="registration-"] { scroll-margin-top: 95px; }
+tr[id^="registration-"]:target { outline: 2px solid #9cd1ee; outline-offset: -2px; background: #f4faff; }
+
+@media (max-width: 1020px) {
+  .portal-header-inner { gap: 8px; }
+  .portal-menu a { padding-inline: 9px; font-size: 1rem; }
+  .portal-header-actions { gap: 2px; }
+  .portal-header-actions .portal-lecturer-user > span { display: none; }
+}
+@media (max-width: 760px) {
+  .portal-header-actions { order: 2; }
+  .portal-activity-toolbar { padding-left: 4px; }
+  .portal-header-actions .portal-lecturer-user { padding-left: 5px; margin-left: 3px; }
+  .portal-toolbar-panel { position: fixed; right: 12px; left: auto; top: 98px; max-height: calc(100dvh - 112px); }
+  .portal-panel-feed { max-height: min(360px, calc(100dvh - 240px)); }
+  .portal-menu { scrollbar-width: thin; }
+}
+@media (max-width: 500px) {
+  .portal-brand { font-size: 1rem; }
+  .portal-header-actions .portal-login-link { margin-left: 2px;  font-size: 1rem;}
+  button.portal-icon-button { width: 36px; height: 38px; }
+  .portal-activity-toolbar { gap: 0; border-left: none; }
+  .portal-header-actions .portal-lecturer-user { border-left: none; }
+  .portal-header-actions .portal-lecturer-user button { font-size: .875rem; }
+  .portal-toolbar-panel { top: 100px; }
+  .portal-lecturer-search, .portal-inbox-toolbar { display: block; }
+  .portal-lecturer-search label, .portal-inbox-toolbar label { display: block; margin-bottom: 7px; }
+  .portal-inbox-time { width: 100%; margin: 3px 0 0; }
+}
+
+/* Logo Physics là nhãn hiệu duy nhất trong header; chữ CapstoneFlow không hiển thị ở đây. */
+@media (max-width: 760px) {
+  .portal-header-logo { width: 150px; height: 38px; }
+}
+@media (max-width: 390px) {
+  .portal-header-logo { width: 132px; height: 34px; }
+}

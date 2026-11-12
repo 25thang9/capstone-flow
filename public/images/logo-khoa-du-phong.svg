@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 90" role="img" aria-label="Tên Khoa Vật lý - Vật lý kỹ thuật">
+<rect width="350" height="90" fill="white"/>
+<path d="M42 8 16 32v23l26 26 26-26V32Z" fill="none" stroke="#003B73" stroke-width="3"/>
+<path d="M30 52c11-20 18-20 27 0M30 39c11 20 18 20 27 0" fill="none" stroke="#0086BE" stroke-width="2"/>
+<circle cx="43" cy="45" r="4" fill="#003B73"/>
+<text x="85" y="36" fill="#003B73" font-size="20" font-family="Arial,sans-serif" font-weight="700">KHOA VẬT LÝ</text>
+<text x="85" y="58" fill="#005E9C" font-size="15" font-family="Arial,sans-serif">VẬT LÝ KỸ THUẬT</text>
+<text x="85" y="76" fill="#69849B" font-size="10" font-family="Arial,sans-serif">Ảnh dự phòng — không phải logo chính thức</text>
+</svg>
