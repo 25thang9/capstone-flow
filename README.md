@@ -98,14 +98,15 @@ Không đưa mật khẩu demo lên trang đăng nhập và không sử dụng m
 
 Mọi API có dạng `{ "success": true/false, "message": "...", "data": ... }`. Request kiểm tra Zod tại server. API không công khai danh sách sinh viên quan tâm.
 
-## 5. File nào để ai sửa?
+## 5. Phân công công việc nhóm 4 người
 
-- **Đăng** (backend core): `prisma/`, `src/lib/prisma.js`, `src/lib/auth.js`, `.env.example`, phần auth trong `src/app/api/v1/auth/`.
-- **Cường** (giao diện sinh viên): `src/app/(public)/`, `src/components/topics/`, `src/components/layout/`.
-- **Ánh** (giao diện giảng viên): `src/app/lecturer/`, `src/components/lecturer/`, phần hộp thư và thanh thông báo.
-- **Đăng và Ánh thống nhất** trước khi sửa `src/components/shared/` hoặc schema `Registration.readAt`.
-- **Linh** (business API + test): `src/services/`, `src/app/api/v1/topics/`, `src/app/api/v1/registrations/`, `src/lib/validations.js`.
-- **Dùng chung**: `src/app/globals.css` và `src/app/site.css`; mọi thay đổi CSS nên thông báo cả Cường và Ánh để hạn chế xung đột.
+- **Thảo — Quản lý dự án & Backend Core:** quản lý GitHub, review Pull Request, cấu hình Neon/Vercel, kiểm tra tích hợp; phụ trách `prisma/`, `src/lib/prisma.js`, `src/lib/auth.js`, `.env.example` và `src/app/api/v1/auth/`.
+- **Đăng — Business API & Kiểm thử:** phụ trách xử lý nghiệp vụ đề tài, đăng ký quan tâm, phân quyền truy cập và kiểm thử API; làm trong `src/services/`, `src/app/api/v1/topics/`, `src/app/api/v1/registrations/`, `src/app/api/v1/lecturer/`, `src/lib/validations.js` và `tests/`.
+- **Châu — Giao diện sinh viên:** hoàn thiện trang chủ, danh sách/tìm kiếm đề tài, trang chi tiết và form gửi quan tâm; phụ trách `src/app/(public)/`, `src/components/topics/`, `src/components/layout/`.
+- **Linh — Giao diện giảng viên:** hoàn thiện đăng nhập, dashboard, quản lý đề tài, hộp thư, thông báo và responsive; phụ trách `src/app/lecturer/` và `src/components/lecturer/`.
+- **File cần phối hợp:** `src/components/shared/`, `src/app/globals.css` và `src/app/site.css` phải trao đổi giữa **Châu và Linh** trước khi sửa để tránh conflict. Mọi thay đổi `prisma/schema.prisma` (đặc biệt các trường `Registration.readAt`, `messageReadAt`) hoặc API contract cần **Thảo và Đăng** thống nhất trước; Linh/Châu được thông báo nếu thay đổi ảnh hưởng giao diện.
+
+**Nguyên tắc:** Mỗi người tạo branch riêng từ `develop`, chỉ push lên branch của mình. Tạo Pull Request vào `develop` để người khác review; sau khi tích hợp và test ổn mới đề xuất merge `develop` vào `main`.
 
 **Đừng sửa trực tiếp trên `main`.** Gợi ý luồng:
 
