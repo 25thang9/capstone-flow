@@ -1,5 +1,3 @@
-/* CapstoneFlow — cách trình bày cổng thông tin học thuật.
-   Chỉ chứa màu sắc, khoảng cách và bố cục. Không chứa logic nghiệp vụ. */
 :root {
   --navy: #07447f;
   --navy-dark: #063767;
