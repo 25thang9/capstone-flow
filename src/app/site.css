@@ -17,8 +17,8 @@ a:hover { color: #0866b0; }
 label { font-weight: 600; color: #293747; }
 input,select,textarea { border-color: #c8d0d9; border-radius: 3px; padding: 11px 12px; }
 input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible { outline-color: #0866b0; }
-.button,.small-button,button:not(.text-button):not(.portal-icon-button):not(.portal-panel-close):not(.portal-feed-row):not(.portal-mark-all):not(.outline) { background: #0b64a8; border-color: #0b64a8; border-radius: 3px; font-weight: 600; }
-.button:hover,.small-button:hover,button:not(.text-button):not(.portal-icon-button):not(.portal-panel-close):not(.portal-feed-row):not(.portal-mark-all):not(.outline):hover { background: #084982; border-color: #084982; }
+.button,.small-button,button:not(.text-button):not(.portal-icon-button):not(.portal-panel-close):not(.portal-feed-row):not(.portal-mark-all):not(.portal-inbox-summary):not(.outline) { background: #0b64a8; border-color: #0b64a8; border-radius: 3px; font-weight: 600; }
+.button:hover,.small-button:hover,button:not(.text-button):not(.portal-icon-button):not(.portal-panel-close):not(.portal-feed-row):not(.portal-mark-all):not(.portal-inbox-summary):not(.outline):hover { background: #084982; border-color: #084982; }
 button.outline,.button.outline,.small-button.outline { background: #fff; color: #0866b0; border-color: #aebdc9; }
 button.outline:hover,.button.outline:hover,.small-button.outline:hover { background: #f0f6fb; color: #084982; border-color: #9daeba; }
 .text-button,.text-link,.back-link { color: #0866b0; }
