@@ -125,7 +125,7 @@ git push -u origin develop
 
 Các branch đề xuất: `feature/student-ui`, `feature/lecturer-ui`, `feature/business-api`, `fix/topic-form`, `fix/registration-test`. PR vào `develop`; reviewer kiểm tra trước khi merge vào `main`.
 
-## 6. Checklist test cơ bản trước khi giao nhóm
+## 6. Checklist test cơ bản 
 
 - [ ] Database Neon kết nối được, có đủ 4 bảng.
 - [ ] Seed tạo được giảng viên và đề tài mẫu.
