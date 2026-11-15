@@ -2,25 +2,6 @@
 
 Website quản lý kho đề tài đồ án và kết nối sinh viên với giảng viên. Bản nền ưu tiên **đủ chức năng, tên file dễ hiểu, dễ chia module**. Giao diện hướng đến **phần mềm quản lý đề tài thực tế**: bố cục học thuật, ít trang trí, nội dung và số liệu đọc từ database. Nhóm có thể chỉnh sửa CSS và từng trang sau khi thống nhất chức năng.
 
-## Giao diện hiện tại — phong cách cổng học vụ gọn gàng
-
-- Giữ header xanh HCMUS và logo Physics trắng do nhóm chọn; **không** đặt chữ CapstoneFlow lớn trên header.
-- Trang chủ **không có banner, số thứ tự lớn hoặc cột card hướng dẫn**: người xem thấy ngay tiêu đề, ô tìm kiếm và danh sách đề tài.
-- Nền trắng, link xanh dương, đường viền mảnh; dùng font hệ thống `Segoe UI`/Arial, nội dung khoảng 16–17px.
-- Danh sách đề tài **không có chip công nghệ**; công nghệ được hiển thị thành dòng chữ bình thường.
-- Form thêm/sửa đề tài chia 3 nhóm bằng đường kẻ, **không có huy hiệu 01/02/03**. Trang đăng nhập không dùng khối khẩu hiệu màu tối.
-- Sửa nhanh màu/font/khoảng cách trong `src/app/site.css`. `src/app/globals.css` giữ style cơ sở và giao diện thông báo/hộp thư.
-- Ảnh minh họa desktop/mobile ở `docs/xem-truoc/`. **Ảnh này dùng dữ liệu mẫu**, không phải website chạy với Neon thật.
-- Hướng dẫn phân chia file và quyết định thiết kế ở `HUONG_DAN_GIAO_DIEN.md`.
-- Nhóm cần xác nhận quyền sử dụng logo chính thức của Khoa trước khi triển khai công khai.
-
-## Bổ sung: Thông báo · Hộp thư · Tìm kiếm
-
-Bản cập nhật có **3 nút chức năng trên header**: tìm kiếm (cả công khai và giảng viên), chuông thông báo (giảng viên), hộp thư (giảng viên). Sinh viên ghi lời nhắn trong form quan tâm; giảng viên đọc trong `/lecturer/messages` và có thể trả lời bằng ứng dụng email. Chuông phản ánh những lượt quan tâm chưa được **xem**; hộp thư có trạng thái đã đọc riêng, trong khi trạng thái `NEW/CONTACTED` phản ánh việc đã **liên hệ** hay chưa.
-
-Để giữ scope MVP 4 tuần, **không làm chat thời gian thực** hoặc thêm tài khoản sinh viên. Bộ ảnh giao diện hiện tại nằm trong `docs/xem-truoc/` (dữ liệu minh họa, không phải ảnh chạy với Neon thật). Xem `HUONG_DAN_THONG_BAO_VA_HOP_THU.md` để biết thao tác, API và checklist test.
-
-**Chú ý schema:** `Registration` có hai cột `readAt` và `messageReadAt` mới. Với database đã khởi tạo từ bản cũ, chạy `npx prisma migrate dev --name add_read_status` sau khi cập nhật code. Với database trống, tạo migration `init` theo hướng dẫn phía dưới. Không thay schema production bằng tay.
 
 ## 1. Công nghệ và yêu cầu
 
@@ -31,7 +12,7 @@ Bản cập nhật có **3 nút chức năng trên header**: tìm kiếm (cả c
 
 ## 2. Chạy trên máy của bạn
 
-1. Giải nén thư mục dự án, mở bằng VS Code, mở Terminal tại thư mục có `package.json`.
+1. Tải hết dự án, mở bằng VS Code, mở Terminal tại thư mục có `package.json`.
 2. Chạy `npm install`.
 3. Tạo file `.env` từ `.env.example` (`cp .env.example .env` trên macOS/Linux; PowerShell: `Copy-Item .env.example .env`).
 4. Trên Neon, tạo project database, lấy hai connection strings:
@@ -47,7 +28,7 @@ npm run db:migrate -- --name init
 npm run db:seed
 npm run dev
 ```
-
+Mọi người tạo neon riêng vs .env riêng rồi test code trên máy mình nha, sau đó push lên nhánh gihub ib tui vô kiểm tra.
 8. Logo đã nằm sẵn trong `public/images/logo-khoa-vat-ly.png`, không cần tải thêm. Kiểm tra header nền xanh hiện logo trắng và tên CapstoneFlow không còn hiển thị ở header.
 9. Truy cập http://localhost:3000. Khi dev server đang chạy, mở terminal thứ hai chạy `npm run test:smoke` để kiểm tra các API cơ bản không cần đăng nhập.
 
@@ -58,74 +39,166 @@ Tài khoản demo sau khi chạy seed:
 - `giangvien1@example.com`
 - `giangvien2@example.com`
 - Mật khẩu: giá trị `SEED_LECTURER_PASSWORD` trong file `.env` của bạn.
+- Cái tui gửi trong nhóm mk tui đặt là 1234567890, mn test thử nha, xong tự tạo .env vs neon riêng để chạy bài sửa riêng.
 
 Không đưa mật khẩu demo lên trang đăng nhập và không sử dụng mật khẩu demo này cho tài khoản thật.
 
-## 3. Đường dẫn giao diện
+## 3. Đường dẫn giao diện 
+Đăng phụ trách đăng nhập và API đề tài; Châu phụ trách giao diện sinh viên và API gửi quan tâm; Linh phụ trách giao diện giảng viên (trừ đăng nhập) và API lượt quan tâm/thông báo/hộp thư.
 
-| Đường dẫn | Mục đích |
-|---|---|
-| `/` | Trang chủ; đề tài đang nhận |
-| `/topics` | Sinh viên tìm kiếm/lọc đề tài |
-| `/topics/[id]` | Xem chi tiết và gửi quan tâm |
-| `/about` | Giới thiệu |
-| `/lecturer/login` | Giảng viên đăng nhập |
-| `/lecturer/dashboard` | Tổng quan |
-| `/lecturer/topics` | Danh sách đề tài của giảng viên |
-| `/lecturer/topics/new` | Thêm đề tài |
-| `/lecturer/topics/[id]/edit` | Sửa đề tài |
-| `/lecturer/registrations` | Danh sách sinh viên quan tâm |
-| `/lecturer/messages` | Hộp thư lời nhắn từ sinh viên |
+| Đường dẫn | Mục đích | Phụ trách | File trang chính |
+|---|---|---|---|
+| `/` | Trang chủ; đề tài đang nhận | **Châu** | `src/app/(public)/page.jsx` |
+| `/topics` | Sinh viên tìm kiếm/lọc đề tài | **Châu** | `src/app/(public)/topics/page.jsx` |
+| `/topics/[id]` | Xem chi tiết và gửi quan tâm | **Châu** | `src/app/(public)/topics/[id]/page.jsx` |
+| `/about` | Giới thiệu | **Châu** | `src/app/(public)/about/page.jsx` |
+| `/lecturer/login` | Giảng viên đăng nhập | **Đăng** | `src/app/lecturer/login/page.jsx` |
+| `/lecturer/dashboard` | Tổng quan | **Linh** | `src/app/lecturer/(protected)/dashboard/page.jsx` |
+| `/lecturer/topics` | Danh sách đề tài của giảng viên | **Linh** | `src/app/lecturer/(protected)/topics/page.jsx` |
+| `/lecturer/topics/new` | Thêm đề tài | **Linh** | `src/app/lecturer/(protected)/topics/new/page.jsx` |
+| `/lecturer/topics/[id]/edit` | Sửa đề tài | **Linh** | `src/app/lecturer/(protected)/topics/[id]/edit/page.jsx` |
+| `/lecturer/registrations` | Danh sách sinh viên quan tâm | **Linh** | `src/app/lecturer/(protected)/registrations/page.jsx` |
+| `/lecturer/messages` | Hộp thư lời nhắn từ sinh viên | **Linh** | `src/app/lecturer/(protected)/messages/page.jsx` |
 
-## 4. Danh sách API
+Lưu ý: Thư mục `(protected)` là **route group** của Next.js, **không xuất hiện trong URL** khi truy cập trình duyệt.
 
-| Method | API | Quyền |
+## 4. Danh sách API và phân công
+
+| Method | API | Quyền | Phụ trách | File xử lý |
+|---|---|---|---|---|
+| POST | `/api/v1/auth/login` | Công khai | **Đăng** | `src/app/api/v1/auth/login/route.js` |
+| POST | `/api/v1/auth/logout` | Giảng viên đăng nhập | **Đăng** | `src/app/api/v1/auth/logout/route.js` |
+| GET | `/api/v1/auth/me` | Giảng viên đăng nhập | **Đăng** | `src/app/api/v1/auth/me/route.js` |
+| GET | `/api/v1/topics?search=&lecturer=&status=OPEN` | Công khai | **Đăng** | `src/app/api/v1/topics/route.js` |
+| GET | `/api/v1/topics/:id` | Công khai | **Đăng** | `src/app/api/v1/topics/[id]/route.js` |
+| POST | `/api/v1/topics` | Giảng viên | **Đăng** | `src/app/api/v1/topics/route.js` |
+| PATCH | `/api/v1/topics/:id` | Giảng viên sở hữu | **Đăng** | `src/app/api/v1/topics/[id]/route.js` |
+| DELETE | `/api/v1/topics/:id` | Giảng viên sở hữu | **Đăng** | `src/app/api/v1/topics/[id]/route.js` |
+| POST | `/api/v1/topics/:id/registrations` | Công khai, khi OPEN | **Châu** | `src/app/api/v1/topics/[id]/registrations/route.js` |
+| GET | `/api/v1/registrations` | Giảng viên, chỉ thấy đề tài mình | **Linh** | `src/app/api/v1/registrations/route.js` |
+| PATCH | `/api/v1/registrations/:id` | Giảng viên sở hữu | **Linh** | `src/app/api/v1/registrations/[id]/route.js` |
+| GET | `/api/v1/lecturer/activity` | Giảng viên đăng nhập | **Linh** | `src/app/api/v1/lecturer/activity/route.js` |
+| PATCH | `/api/v1/lecturer/notifications` | Giảng viên đăng nhập | **Linh** | `src/app/api/v1/lecturer/notifications/route.js` |
+| PATCH | `/api/v1/lecturer/messages` | Giảng viên đăng nhập | **Linh** | `src/app/api/v1/lecturer/messages/route.js` |
+
+**Quy tắc dùng chung API:** Mọi API trả về dạng `{ "success": true/false, "message": "...", "data": ... }`; dữ liệu đầu vào phải được kiểm tra ở server; API riêng tư phải xác thực và kiểm tra quyền sở hữu đề tài. Châu phụ trách endpoint POST gửi quan tâm nhưng **không tự sửa** phần quản lý thông báo/lượt quan tâm của Linh. Châu và Linh trao đổi trước khi đổi cấu trúc request/response liên quan đến `Registration`.
+
+**Nguyên tắc:** Mỗi trang và API chỉ có **một người phụ trách chính** theo đúng mục 3 và mục 4. Phân công ở đây áp dụng cho giai đoạn **Đăng, Châu, Linh chỉnh sửa, kiểm thử và gửi Pull Request**.
+
+### 5.1. Thảo — ĐÃ HOÀN THÀNH CODE NỀN
+
+Thảo đã khởi tạo Next.js, Prisma, Neon, bộ code nền, GitHub và Vercel.
+
+- Xem kết quả, **review/duyệt Pull Request**, quyết định merge `develop` → `main`.
+- Chốt và cấu hình **Neon chính/Vercel production** sau khi nhóm kiểm thử xong; không cho các bạn chỉnh trực tiếp dữ liệu chính.
+- Theo dõi các thay đổi schema do nhóm đề xuất. Chỉ áp dụng migration vào Neon chính **sau khi đã được kiểm thử**, không tự ý reset database chính.
+
+Các file nền như `prisma/schema.prisma`, `prisma/migrations/`, `prisma/seed.mjs`, `src/lib/prisma.js`, `.env.example`, `.gitignore`, `next.config.mjs` **giữ nguyên mặc định**. Nếu thật sự cần thay đổi, Đăng đề xuất trong PR và Thảo duyệt.
+
+### 5.2. Đăng — Trang đăng nhập giảng viên + Auth + API đề tài (8 API)
+
+**Giao diện Đăng phụ trách:**
+
+- `src/app/lecturer/login/page.jsx` — trang `/lecturer/login`: chỉnh form, hiển thị lỗi, loading, trạng thái đăng nhập và responsive.
+
+**Auth/API Đăng phụ trách:**
+
+- `src/app/api/v1/auth/login/route.js` — `POST /api/v1/auth/login`.
+- `src/app/api/v1/auth/logout/route.js` — `POST /api/v1/auth/logout`.
+- `src/app/api/v1/auth/me/route.js` — `GET /api/v1/auth/me`.
+- `src/app/api/v1/topics/route.js` — `GET /api/v1/topics` và `POST /api/v1/topics` (chung 1 file).
+- `src/app/api/v1/topics/[id]/route.js` — `GET`, `PATCH`, `DELETE /api/v1/topics/:id` (chung 1 file).
+
+**Logic, validation và test:**
+
+- `src/lib/auth.js` — xác thực, session, kiểm tra giảng viên; giữ tương thích cookie/session đã có.
+- `src/lib/validations.js`, `src/lib/response.js` — validation và response chuẩn cho API. Nếu Châu/Linh cần sửa validation, gửi yêu cầu Đăng xử lý.
+- `src/services/topic.service.js` — nghiệp vụ tạo, tìm kiếm, sửa, xóa, đóng/mở đề tài.
+- `tests/` — Đăng phụ trách tổ chức và tổng hợp test API; Châu và Linh cung cấp ca kiểm thử thuộc API mình phụ trách.
+
+**Tiêu chí hoàn thành:** Đăng nhập/đăng xuất ổn định; API đề tài đúng quyền và dữ liệu; giảng viên A không thể sửa/xóa đề tài B; xử lý lỗi 400/401/403/404/409 phù hợp. Đăng **không sở hữu** các API đăng ký, thông báo, hộp thư được phân cho Châu/Linh.
+
+### 5.3. Châu — Giao diện sinh viên + API gửi quan tâm (1 API)
+
+**Trang Châu phụ trách:**
+
+- `src/app/(public)/page.jsx` — trang chủ `/`.
+- `src/app/(public)/topics/page.jsx` — kho đề tài `/topics`, tìm kiếm/lọc.
+- `src/app/(public)/topics/[id]/page.jsx` — chi tiết đề tài `/topics/[id]`.
+- `src/app/(public)/about/page.jsx` — trang giới thiệu `/about`.
+- `src/app/(public)/layout.jsx` — bố cục chung khu sinh viên.
+
+**Component Châu phụ trách:**
+
+- `src/components/topics/TopicCard.jsx`, `TopicList.jsx`, `StudentRegistrationForm.jsx` — danh sách/chi tiết/form gửi quan tâm.
+- `src/components/layout/PublicHeader.jsx`, `PublicFooter.jsx`, `FacultyLogo.jsx` — menu, footer và logo khu công khai.
+- `src/components/shared/HeaderSearch.jsx` — tìm kiếm dùng chung; Linh cần báo Châu nếu thay đổi component này.
+
+**API Châu phụ trách:**
+
+- `src/app/api/v1/topics/[id]/registrations/route.js` — `POST /api/v1/topics/:id/registrations`.
+
+**Tiêu chí hoàn thành:** Tìm/lọc được đề tài; xem chi tiết; form kiểm tra dữ liệu, gửi thành công; không gửi trùng email cùng đề tài hoặc vào đề tài đóng; có loading, empty, error và responsive. API này sử dụng `registration.service.js` (Linh phụ trách), vì vậy **Châu và Linh phải thống nhất đầu vào/đầu ra**, không tự sửa service của nhau.
+
+### 5.4. Linh — Giao diện giảng viên trừ login + API đăng ký/thông báo/hộp thư (5 API)
+
+**Trang Linh phụ trách:**
+
+- `src/app/lecturer/(protected)/layout.jsx` — bố cục giảng viên sau đăng nhập.
+- `src/app/lecturer/(protected)/dashboard/page.jsx` — `/lecturer/dashboard`.
+- `src/app/lecturer/(protected)/topics/page.jsx` — `/lecturer/topics`.
+- `src/app/lecturer/(protected)/topics/new/page.jsx` — `/lecturer/topics/new`.
+- `src/app/lecturer/(protected)/topics/[id]/edit/page.jsx` — `/lecturer/topics/[id]/edit`.
+- `src/app/lecturer/(protected)/registrations/page.jsx` — `/lecturer/registrations`.
+- `src/app/lecturer/(protected)/messages/page.jsx` — `/lecturer/messages`.
+
+**Component Linh phụ trách:**
+
+- `src/components/lecturer/LecturerNavigation.jsx`, `LecturerActivityToolbar.jsx` — menu, chuông, tìm kiếm, hộp thư trên thanh giảng viên.
+- `src/components/lecturer/LecturerTopicList.jsx`, `TopicForm.jsx` — danh sách/form thêm/sửa đề tài.
+- `src/components/lecturer/RegistrationList.jsx`, `StudentMessageList.jsx` — lượt quan tâm/hộp thư.
+- `src/components/shared/PortalIcons.jsx` — icon dùng chung, Châu báo Linh trước khi sửa.
+
+**API Linh phụ trách:**
+
+- `src/app/api/v1/registrations/route.js` — `GET /api/v1/registrations`.
+- `src/app/api/v1/registrations/[id]/route.js` — `PATCH /api/v1/registrations/:id`.
+- `src/app/api/v1/lecturer/activity/route.js` — `GET /api/v1/lecturer/activity`.
+- `src/app/api/v1/lecturer/notifications/route.js` — `PATCH /api/v1/lecturer/notifications`.
+- `src/app/api/v1/lecturer/messages/route.js` — `PATCH /api/v1/lecturer/messages`.
+- `src/services/registration.service.js` — nghiệp vụ danh sách quan tâm, trạng thái `NEW/CONTACTED`, `readAt`, `messageReadAt` và truy vấn hộp thư; phối hợp Châu ở endpoint gửi quan tâm.
+
+**Tiêu chí hoàn thành:** Dashboard đọc dữ liệu đúng; CRUD form UI kết nối API Đăng; nhận quan tâm, đọc thông báo/hộp thư, đánh dấu đã xem/đã liên hệ; giảng viên chỉ thấy dữ liệu thuộc đề tài mình; responsive và sửa lỗi tương phản chữ trong hộp thư. **Linh không phụ trách trang `/lecturer/login` hoặc các API auth/topics của Đăng.**
+
+### 5.5. Các file giao diện dùng chung — chốt người phụ trách
+
+| File hoặc nhóm file | Người phụ trách chính | Cách phối hợp |
 |---|---|---|
-| POST | `/api/v1/auth/login` | Công khai |
-| POST | `/api/v1/auth/logout` | Giảng viên đăng nhập |
-| GET | `/api/v1/auth/me` | Giảng viên đăng nhập |
-| GET | `/api/v1/topics?search=&lecturer=&status=OPEN` | Công khai |
-| GET | `/api/v1/topics/:id` | Công khai |
-| POST | `/api/v1/topics` | Giảng viên |
-| PATCH | `/api/v1/topics/:id` | Giảng viên sở hữu |
-| DELETE | `/api/v1/topics/:id` | Giảng viên sở hữu |
-| POST | `/api/v1/topics/:id/registrations` | Công khai, khi OPEN |
-| GET | `/api/v1/registrations` | Giảng viên, chỉ thấy đề tài mình |
-| PATCH | `/api/v1/registrations/:id` | Giảng viên sở hữu |
-| GET | `/api/v1/lecturer/activity` | Giảng viên đăng nhập |
-| PATCH | `/api/v1/lecturer/notifications` | Giảng viên đăng nhập |
-| PATCH | `/api/v1/lecturer/messages` | Giảng viên đăng nhập |
+| `src/components/topics/*` | **Châu** | Linh chỉ dùng dữ liệu/API tương thích, không tự sửa component Châu. |
+| `src/components/lecturer/*` | **Linh** | Đăng hỗ trợ hợp đồng API, không tự chỉnh giao diện Linh. |
+| `src/components/layout/*` | **Châu** | Châu sửa header/footer/logo công khai; thay đổi logo dùng chung báo Linh. |
+| `src/components/shared/HeaderSearch.jsx` | **Châu** | Linh yêu cầu thay đổi qua Châu. |
+| `src/components/shared/PortalIcons.jsx` | **Linh** | Châu yêu cầu thay đổi qua Linh. |
+| `src/app/globals.css` | **Châu** | CSS nền dùng chung: chỉ Châu chỉnh trong PR riêng, trao đổi với Linh trước khi đổi style toàn cục. |
+| `src/app/site.css` — selector `.portal-*` cho sinh viên | **Châu** | Chỉ sửa phần Public UI, không thay nhóm `.lecturer-*`. |
+| `src/app/site.css` — selector `.lecturer-*`, `.editor-*` cho giảng viên | **Linh** | Chỉ sửa phần Lecturer UI; phần `.portal-*` dùng chung header cần trao đổi với Châu. |
+| `src/app/site.css` — `:root`, `body`, `button`, `input` và selector chung | **Châu (đầu mối)** | Châu/Linh không sửa đồng thời; khi cần đổi style chung, Linh đề xuất và Châu phối hợp merge. |
+| `src/app/layout.jsx`, `src/app/error.jsx`, `src/app/loading.jsx`, `src/app/not-found.jsx` | **Châu (đầu mối giao diện)** | Châu trao đổi với Linh vì các trang này ảnh hưởng toàn site. |
+| `src/lib/auth.js`, API auth và trang login | **Đăng** | Đăng chịu trách nhiệm end-to-end luồng đăng nhập, thông báo Linh nếu thay session/route. |
+| `src/lib/prisma.js`, `prisma/schema.prisma`, `prisma/migrations/` | **Giữ nền Thảo đã chốt** | Nếu cần sửa, Đăng đề xuất migration bằng PR; Thảo chỉ duyệt và quyết định áp dụng Neon chính sau cùng. |
 
-Mọi API có dạng `{ "success": true/false, "message": "...", "data": ... }`. Request kiểm tra Zod tại server. API không công khai danh sách sinh viên quan tâm.
+**Lưu ý về CSS:** Hiện cả Public UI và Lecturer UI vẫn dùng chung `site.css`, vì vậy phải **pull `develop` mới nhất trước khi sửa**, tránh hai PR ghi đè. Nếu sau này muốn tách thành `public.css` và `lecturer.css` thì cần một PR riêng thống nhất import, tránh thay đổi cấu trúc giữa chừng.
 
-## 5. Phân công công việc nhóm 4 người
+### 5.6. Branch, Pull Request và nghiệm thu
 
-- **Thảo — Quản lý dự án & Backend Core:** quản lý GitHub, review Pull Request, cấu hình Neon/Vercel, kiểm tra tích hợp; phụ trách `prisma/`, `src/lib/prisma.js`, `src/lib/auth.js`, `.env.example` và `src/app/api/v1/auth/`.
-- **Đăng — Business API & Kiểm thử:** phụ trách xử lý nghiệp vụ đề tài, đăng ký quan tâm, phân quyền truy cập và kiểm thử API; làm trong `src/services/`, `src/app/api/v1/topics/`, `src/app/api/v1/registrations/`, `src/app/api/v1/lecturer/`, `src/lib/validations.js` và `tests/`.
-- **Châu — Giao diện sinh viên:** hoàn thiện trang chủ, danh sách/tìm kiếm đề tài, trang chi tiết và form gửi quan tâm; phụ trách `src/app/(public)/`, `src/components/topics/`, `src/components/layout/`.
-- **Linh — Giao diện giảng viên:** hoàn thiện đăng nhập, dashboard, quản lý đề tài, hộp thư, thông báo và responsive; phụ trách `src/app/lecturer/` và `src/components/lecturer/`.
-- **File cần phối hợp:** `src/components/shared/`, `src/app/globals.css` và `src/app/site.css` phải trao đổi giữa **Châu và Linh** trước khi sửa để tránh conflict. Mọi thay đổi `prisma/schema.prisma` (đặc biệt các trường `Registration.readAt`, `messageReadAt`) hoặc API contract cần **Thảo và Đăng** thống nhất trước; Linh/Châu được thông báo nếu thay đổi ảnh hưởng giao diện.
+- **Đăng:** `feature/auth-topic-api` — login UI, 8 API, logic và test.
+- **Châu:** `feature/student-ui` — 4 trang sinh viên và POST gửi quan tâm.
+- **Linh:** `feature/lecturer-ui` — 6 trang giảng viên và 5 API.
+- Mỗi người **clone repo, tạo `.env` Neon riêng trên máy, làm trên branch của mình**; không commit `.env`, `.next/`, `node_modules/`.
+- Tạo PR **feature → `develop`** với ảnh trước/sau và bằng chứng test. Chỉ chỉnh file của phần mình; nếu cần sửa file chung, trao đổi và nêu rõ trong PR.
+- **Thảo** đọc PR và duyệt/merge. Khi cả ba phần được kiểm thử, mới tạo PR **`develop` → `main`** và chốt Neon production trên Vercel. Không tự push thẳng lên `main`.
 
-**Nguyên tắc:** Mỗi người tạo branch riêng từ `develop`, chỉ push lên branch của mình. Tạo Pull Request vào `develop` để người khác review; sau khi tích hợp và test ổn mới đề xuất merge `develop` vào `main`.
-
-**Đừng sửa trực tiếp trên `main`.** Gợi ý luồng:
-
-```bash
-git init
-git add .
-git commit -m "feat: tao code nen capstoneflow"
-git branch -M main
-# Tạo repository trên GitHub rồi gắn remote (thay URL đúng repo của nhóm)
-git remote add origin https://github.com/OWNER/REPO.git
-git push -u origin main
-# Tạo branch develop sau khi main chạy ổn
-git switch -c develop
-git push -u origin develop
-```
-
-Các branch đề xuất: `feature/student-ui`, `feature/lecturer-ui`, `feature/business-api`, `fix/topic-form`, `fix/registration-test`. PR vào `develop`; reviewer kiểm tra trước khi merge vào `main`.
-
-## 6. Checklist test cơ bản 
+## 6. Checklist test cơ bản trước khi giao nhóm
 
 - [ ] Database Neon kết nối được, có đủ 4 bảng.
 - [ ] Seed tạo được giảng viên và đề tài mẫu.
@@ -156,9 +229,3 @@ Các branch đề xuất: `feature/student-ui`, `feature/lecturer-ui`, `feature/
 Sau lần `npm install` đầu tiên, hãy commit thêm `package-lock.json` được npm tạo ra để cả nhóm cài đúng bộ phiên bản đã chốt.
 
 
-## Điều chỉnh chữ và khả năng đọc (bản cập nhật 12/11/2026)
-
-- Font thống nhất: Arial, fallback Helvetica / sans-serif; không cần tải font.
-- Nội dung chính: khoảng 17px; nhãn biểu mẫu và dữ liệu bảng: 16px; thông tin phụ: khoảng 14–15px; tiêu đề từ 22px.
-- CSS sửa trực tiếp tại `src/app/globals.css`; không thay đổi API, Prisma, session, dữ liệu hay routes.
-- Cỡ chữ được cân đối lại trên màn hình desktop và điện thoại.
