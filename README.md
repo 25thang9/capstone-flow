@@ -9,18 +9,18 @@ Kho đề tài đồ án của Khoa Vật lý – Vật lý Kỹ thuật: giản
 
 | Thành viên | Phụ trách |
 |---|---|
-| (Thành viên 1) | Nền móng dự án (cấu hình, database, `src/lib`) + giao diện công khai cho Khách |
-| (Thành viên 2) | Phần Sinh viên: gửi / rút đăng ký, `/my-registrations` |
-| (Thành viên 3) | Phần Giảng viên: `/lecturer`, quản lý đề tài, duyệt đăng ký, xuất CSV |
-| (Thành viên 4) | Phần Quản trị: `/admin`, người dùng, bộ môn và thẻ |
+| Linh | Nền móng dự án (cấu hình, database, `src/lib`) + giao diện công khai cho Khách |
+| Châu | Phần Sinh viên: gửi / rút đăng ký, `/my-registrations` |
+| Đăng | Phần Giảng viên: `/lecturer`, quản lý đề tài, duyệt đăng ký, xuất CSV |
+| Thảo | Phần Quản trị: `/admin`, người dùng, bộ môn và thẻ |
 
 ## Công nghệ
 
 - Next.js 16 (App Router) · React 19 · TypeScript 5
-- Tailwind CSS v4
+- Tailwind CSS v4 · shadcn/ui (Radix) · next-themes
 - Prisma ORM 7 + PostgreSQL (Neon), adapter `@prisma/adapter-pg`
 - Better Auth (email + mật khẩu; 3 vai trò `STUDENT`, `LECTURER`, `ADMIN`)
-- Zod 4 · Vitest 5
+- Zod 4 · Vitest 5 + Testing Library
 
 ## Chạy local
 
@@ -52,9 +52,11 @@ npx vitest run
 ```
 prisma/                schema.prisma, migrations, seed.ts
 src/app/               route (page, layout, route handler)
+src/components/        ui/ (shadcn) · shared/ · layout/
 src/features/<tên>/    mỗi nghiệp vụ: schema · rules · filters · queries · actions · components
 src/lib/               hạ tầng: prisma, auth, dal (phiên + quyền), pagination, action-state, ...
-tests/unit/            unit test
+src/proxy.ts           chuyển hướng khách chưa đăng nhập ở các đường dẫn cần quyền
+tests/                 unit/ · component/
 ```
 
 ## Mô hình dữ liệu
@@ -68,10 +70,10 @@ tests/unit/            unit test
 | `Topic` | Đề tài | n–1 `User` (giảng viên), n–1 `Department`, n–n `Tag`, 1–n `Registration` |
 | `Registration` | Sinh viên đăng ký đề tài | n–1 `Topic`, n–1 `User` (sinh viên); unique `(topicId, studentId)` |
 
-## Tiến độ
+## Tiến độ của linh
 
 - [x] **Giai đoạn 1** – Nền móng: cấu hình TypeScript / Prisma 7 / Vitest, schema + migration + seed, tầng `src/lib`
-- [ ] Giai đoạn 2 – Giao diện chung, đăng nhập / đăng ký, trang giới thiệu
+- [x] **Giai đoạn 2** – Giao diện chung, đăng nhập / đăng ký, trang giới thiệu
 - [ ] Giai đoạn 3 – Trang chủ
 - [ ] Giai đoạn 4 – Kho đề tài: tìm kiếm, lọc, phân trang
 - [ ] Giai đoạn 5 – Chi tiết đề tài, E2E test, CI
