@@ -1,10 +1,5 @@
 import { z } from "zod";
 
-/**
- * Kết quả chung của mọi Server Action gắn với form (dùng cùng useActionState).
- * - fieldErrors: lỗi theo từng ô, hiển thị ngay dưới ô đó.
- * - values: giá trị người dùng vừa nhập, để form không bị xoá trắng khi có lỗi.
- */
 export type ActionState =
   | { status: "idle" }
   | { status: "success"; message: string }
@@ -34,12 +29,10 @@ export function validationFailure(error: z.ZodError, formData: FormData): Action
   };
 }
 
-/** Lấy lại giá trị dạng chuỗi của form. Không bao giờ trả mật khẩu về trình duyệt. */
 export function formValues(formData: FormData): Record<string, string> {
   const values: Record<string, string> = {};
   for (const [key, value] of formData.entries()) {
     if (typeof value !== "string" || key.toLowerCase().includes("password")) continue;
-    // Ô nhiều giá trị (checkbox cùng name) được nối bằng dấu phẩy.
     values[key] = key in values ? `${values[key]},${value}` : value;
   }
   return values;

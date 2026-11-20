@@ -1,10 +1,3 @@
-/**
- * Dữ liệu mẫu cho CapstoneFlow.  Chạy: npx prisma db seed
- *
- * - Chạy lại nhiều lần không nhân bản dữ liệu (tài khoản upsert theo email; đề tài chỉ tạo khi bảng trống).
- * - SEED_RESET=1 xoá sạch dữ liệu trước khi tạo lại – dùng cho database kiểm thử E2E, KHÔNG dùng cho production.
- * - Mọi tài khoản demo dùng chung mật khẩu SEED_PASSWORD trong .env. Tên người là tên giả.
- */
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hashPassword } from "better-auth/crypto";
 
@@ -17,7 +10,6 @@ const prisma = new PrismaClient({
 });
 
 const DAY = 24 * 60 * 60 * 1000;
-// Mốc thời gian cố định để thứ tự "mới cập nhật" giống nhau ở mọi máy.
 const BASE_TIME = new Date("2026-11-10T02:00:00.000Z").getTime();
 
 const ACCOUNTS: { email: string; name: string; role: Role }[] = [
@@ -310,7 +302,6 @@ const TOPICS: TopicSeed[] = [
   },
 ];
 
-// [chỉ số đề tài, email sinh viên, trạng thái, lời nhắn, phản hồi của giảng viên]
 const REGISTRATIONS: [number, string, RegistrationStatus, string | null, string | null][] = [
   [0, "sv.an@example.com", "ACCEPTED", "Em đã làm đồ án môn học về ESP32, mong được thầy hướng dẫn.", "Đồng ý. Em gặp thầy sáng thứ Ba tại phòng B32."],
   [0, "sv.bich@example.com", "PENDING", "Em muốn làm phần web hiển thị dữ liệu ạ.", null],
@@ -346,7 +337,6 @@ async function main() {
     console.log("Đã xoá dữ liệu cũ (SEED_RESET=1).");
   }
 
-  // 1. Tài khoản: tạo User + Account "credential" đúng theo cách Better Auth lưu mật khẩu.
   const passwordHash = await hashPassword(password);
   const userIdByEmail = new Map<string, string>();
   for (const account of ACCOUNTS) {
@@ -382,7 +372,6 @@ async function main() {
     }
   }
 
-  // 2. Danh mục.
   for (const name of DEPARTMENTS) {
     await prisma.department.upsert({ where: { name }, update: {}, create: { name, slug: slugify(name) } });
   }
@@ -390,7 +379,6 @@ async function main() {
     await prisma.tag.upsert({ where: { name }, update: {}, create: { name, slug: slugify(name) } });
   }
 
-  // 3. Đề tài và đăng ký mẫu: chỉ tạo khi chưa có đề tài nào.
   if ((await prisma.topic.count()) > 0) {
     console.log("Đã có đề tài trong database nên bỏ qua phần đề tài mẫu.");
     return;
@@ -401,7 +389,6 @@ async function main() {
 
   const topicIds: string[] = [];
   for (const [index, topic] of TOPICS.entries()) {
-    // Đề tài đứng trước trong danh sách có thời điểm cập nhật mới hơn.
     const timestamp = new Date(BASE_TIME - index * DAY);
     const created = await prisma.topic.create({
       data: {

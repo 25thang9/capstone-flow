@@ -1,6 +1,3 @@
-// CapstoneFlow – mô hình dữ liệu (Prisma ORM 7).
-// 4 bảng đầu là bảng của Better Auth; 4 model nghiệp vụ nằm phía dưới.
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -27,15 +24,12 @@ enum RegistrationStatus {
   REJECTED
 }
 
-// ───────────────────────── Better Auth ─────────────────────────
-
 model User {
   id            String   @id
   name          String
   email         String   @unique
   emailVerified Boolean  @default(false)
   image         String?
-  // Vai trò KHÔNG nhận từ form đăng ký (input: false trong src/lib/auth.ts).
   role          Role     @default(STUDENT)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -96,9 +90,6 @@ model Verification {
   @@map("verification")
 }
 
-// ───────────────────────── Nghiệp vụ ─────────────────────────
-
-/// Bộ môn của Khoa. Mỗi đề tài thuộc đúng một bộ môn (1–n).
 model Department {
   id        String   @id @default(cuid())
   name      String   @unique
@@ -109,7 +100,6 @@ model Department {
   @@map("department")
 }
 
-/// Thẻ công nghệ / lĩnh vực. Quan hệ n–n với Topic (bảng nối do Prisma tự tạo).
 model Tag {
   id        String   @id @default(cuid())
   name      String   @unique
@@ -145,7 +135,6 @@ model Topic {
   @@map("topic")
 }
 
-/// Một sinh viên đăng ký một đề tài. Mỗi cặp (đề tài, sinh viên) chỉ có một dòng.
 model Registration {
   id           String             @id @default(cuid())
   studentCode  String
@@ -153,7 +142,6 @@ model Registration {
   phone        String?
   message      String?
   status       RegistrationStatus @default(PENDING)
-  // Phản hồi của giảng viên khi nhận / từ chối.
   lecturerNote String?
   respondedAt  DateTime?
   createdAt    DateTime           @default(now())
