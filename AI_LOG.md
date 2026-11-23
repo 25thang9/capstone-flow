@@ -15,13 +15,13 @@ Nhật ký ghi nhận quá trình sử dụng AI trong việc phát triển và 
 
 | Ngày | Công cụ | Việc nhờ AI | Prompt (tóm tắt) | Kết quả dùng thế nào | Đã tự kiểm chứng / sửa gì | Commit/PR |
 |---|---|---|---|---|---|---|
-| YYYY-MM-DD | — | — | — | — | — | — |
+| 2026-11-23 | ChatGPT | Hỗ trợ phát triển giao diện và kiểm thử cho phân hệ giảng viên bằng Next.js 16, React và TypeScript | "Hỗ trợ xây dựng giao diện giảng viên gồm Tổng quan, Đề tài của tôi và Sinh viên đăng ký; sử dụng Header/Footer chung, phân quyền LECTURER, bổ sung bộ lọc và unit/component tests, chưa tích hợp dữ liệu nghiệp vụ" | Hoàn thiện giao diện 3 trang `/lecturer`, `/lecturer/topics`, `/lecturer/registrations`; xây dựng menu điều hướng, các thẻ thống kê, bảng danh sách, tìm kiếm và lọc trạng thái. Tổ chức component riêng cho giảng viên, bổ sung unit/component tests. Các chức năng thêm đề tài và xuất CSV được giữ ở trạng thái chưa kích hoạt để triển khai trong các PR tiếp theo | Kiểm tra trực tiếp 3 trang trên localhost bằng tài khoản có quyền LECTURER; xác nhận điều hướng, bố cục và khả năng sử dụng Header/Footer chung. Rà soát mã nguồn, điều chỉnh để tách giao diện khỏi truy vấn dữ liệu chưa triển khai; xử lý lỗi prerender Next.js 16 và cảnh báo SSL khi kết nối Neon. Sử dụng ESLint, TypeScript, Vitest và Next.js Build để kiểm tra trước khi tạo PR | `feature/thao-lecturer-foundation` (PR giao diện giảng viên) |
 
 ### Tự đánh giá cuối bài
 
 - **Phần tự làm hoàn toàn:** Chưa tổng kết.
 - **Phần AI giúp nhiều nhất và cách đã hiểu nội dung đó:** Chưa tổng kết.
-- **Một lần AI sai và cách phát hiện:** Chưa tổng kết.
+- **Một lần AI sai và cách phát hiện:** Trong quá trình phát triển, AI đề xuất tích hợp truy vấn dữ liệu vào Dashboard khi chức năng nghiệp vụ chưa được triển khai. Sau khi đối chiếu với phạm vi công việc, phần truy vấn được loại bỏ để tập trung hoàn thiện giao diện và kiểm thử trước khi phát triển các chức năng tiếp theo.
 
 ---
 
