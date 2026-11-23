@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro, Source_Serif_4 } from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -15,12 +15,6 @@ const beVietnam = Be_Vietnam_Pro({
   display: "swap",
 });
 
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin", "vietnamese"],
-  variable: "--font-source-serif",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: {
     default: "CapstoneFlow – Kho đề tài đồ án",
@@ -32,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="vi" className={`${beVietnam.variable} ${sourceSerif.variable}`} suppressHydrationWarning>
+    <html lang="vi" className={beVietnam.variable} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
