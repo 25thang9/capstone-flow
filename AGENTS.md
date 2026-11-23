@@ -40,13 +40,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `src/lib/` là hạ tầng: `dal.ts` (phiên và quyền), `auth.ts`, `prisma.ts`, `pagination.ts`, `action-state.ts`.
 
 ### Phân quyền
-- Ba vai trò: STUDENT, LECTURER, ADMIN (`src/generated/prisma/enums`). Vai trò chỉ đổi qua `changeRoleAction`.
+- Ba vai trò: STUDENT, LECTURER, ADMIN (`src/generated/prisma/enums`). Vai trò chỉ được đổi bởi ADMIN qua Server Action có kiểm tra quyền.
 - `src/lib/dal.ts` là nơi DUY NHẤT đọc phiên. Không đọc cookie hay gọi auth.api.getSession ở chỗ khác.
 - Không dựa vào layout hay `proxy.ts` để bảo vệ dữ liệu: kiểm tra quyền nằm trong chính hàm truy vấn / action.
 - Trang công khai chỉ `select` đúng cột cần hiển thị; không trả email hay số điện thoại ra ngoài khu giảng viên.
 
 ### Dữ liệu và form
-- Bộ lọc và phân trang nằm trên URL (searchParams), đọc bằng hàm `parse…Filters` và lọc ở server. Không giữ bộ lọc trong state.
+- Bộ lọc và phân trang nằm trên URL (searchParams), đọc từ `searchParams` và lọc ở server. Không giữ bộ lọc trong state.
 - Luật nghiệp vụ viết thành hàm thuần trong `rules.ts`, có unit test trong `tests/unit/`; giao diện và action dùng chung hàm đó.
 - Form dùng `useActionState` + Server Action trả `ActionState`; lỗi hiển thị dưới từng ô, không dùng `alert()`.
 - Thao tác khó hoàn tác (xoá, rút đăng ký) đi qua `ConfirmAction`.

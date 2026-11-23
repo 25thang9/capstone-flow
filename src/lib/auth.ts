@@ -6,7 +6,6 @@ import { nextCookies } from "better-auth/next-js";
 
 import { prisma } from "@/lib/prisma";
 
-// Cấu hình Better Auth. BETTER_AUTH_SECRET và BETTER_AUTH_URL được đọc từ biến môi trường.
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   emailAndPassword: {
@@ -16,8 +15,6 @@ export const auth = betterAuth({
   },
   user: {
     additionalFields: {
-      // input: false → người dùng không thể tự gán vai trò khi đăng ký.
-      // Chỉ quản trị viên đổi vai trò, qua Server Action có kiểm tra quyền.
       role: {
         type: "string",
         required: false,
@@ -30,6 +27,5 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
   },
-  // nextCookies phải đứng cuối: giúp Server Action đặt được cookie phiên.
   plugins: [nextCookies()],
 });

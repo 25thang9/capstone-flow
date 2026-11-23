@@ -14,7 +14,6 @@ const DATE_TIME_FORMAT = new Intl.DateTimeFormat("vi-VN", {
   timeZone: "Asia/Ho_Chi_Minh",
 });
 
-// Luôn ghi rõ múi giờ: máy chủ Vercel chạy giờ UTC, nếu không ngày sẽ lệch so với Việt Nam.
 export function formatDate(date: Date | string): string {
   return DATE_FORMAT.format(new Date(date));
 }
@@ -23,7 +22,6 @@ export function formatDateTime(date: Date | string): string {
   return DATE_TIME_FORMAT.format(new Date(date));
 }
 
-/** Chuyển tên tiếng Việt thành slug dùng trên URL: "Vật lý Tin học" → "vat-ly-tin-hoc". */
 export function slugify(input: string): string {
   return input
     .replace(/\+/g, " plus ")
@@ -36,7 +34,6 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-/** Lấy tối đa hai chữ cái đầu của tên để làm ảnh đại diện: "Trần Minh Khoa" → "TK". */
 export function initials(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (words.length === 0) return "?";
