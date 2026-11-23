@@ -70,10 +70,10 @@ tests/                 unit/ · component/
 | `Topic` | Đề tài | n–1 `User` (giảng viên), n–1 `Department`, n–n `Tag`, 1–n `Registration` |
 | `Registration` | Sinh viên đăng ký đề tài | n–1 `Topic`, n–1 `User` (sinh viên); unique `(topicId, studentId)` |
 
-## Tiến độ của linh
+## Tiến độ
 
 - [x] **Giai đoạn 1** – Nền móng: cấu hình TypeScript / Prisma 7 / Vitest, schema + migration + seed, tầng `src/lib`
 - [x] **Giai đoạn 2** – Giao diện chung, đăng nhập / đăng ký, trang giới thiệu
-- [ ] Giai đoạn 3 – Trang chủ
+- [x] **Giai đoạn 3** – Trang chủ công khai và hiện danh sách đề tài, bộ môn
 - [ ] Giai đoạn 4 – Kho đề tài: tìm kiếm, lọc, phân trang
 - [ ] Giai đoạn 5 – Chi tiết đề tài, E2E test, CI

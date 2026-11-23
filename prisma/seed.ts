@@ -35,6 +35,7 @@ const DEPARTMENTS = [
   "Vật lý Ứng dụng",
   "Vật lý Lý thuyết",
   "Vật lý Chất rắn",
+  "Vật lý Địa cầu",
 ];
 
 const TAGS = [
