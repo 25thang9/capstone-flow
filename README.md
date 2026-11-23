@@ -75,5 +75,5 @@ tests/                 unit/ · component/
 - [x] **Giai đoạn 1** – Nền móng: cấu hình TypeScript / Prisma 7 / Vitest, schema + migration + seed, tầng `src/lib`
 - [x] **Giai đoạn 2** – Giao diện chung, đăng nhập / đăng ký, trang giới thiệu
 - [x] **Giai đoạn 3** – Trang chủ công khai và hiện danh sách đề tài, bộ môn
-- [ ] Giai đoạn 4 – Kho đề tài: tìm kiếm, lọc, phân trang
+- [x] **Giai đoạn 4** – Kho đề tài: tìm kiếm, lọc, phân trang
 - [ ] Giai đoạn 5 – Chi tiết đề tài, E2E test, CI
