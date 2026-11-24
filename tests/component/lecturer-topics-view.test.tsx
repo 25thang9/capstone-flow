@@ -26,14 +26,14 @@ function renderList(options?: { topics?: LecturerTopicRow[]; filters?: LecturerT
   render(<LecturerTopicsView filters={options?.filters ?? defaults} topics={topics} pagination={paginate(topics.length, 1, 10)} />);
 }
 
-describe("danh sách đề tài giảng viên PR2", () => {
+describe("danh sách đề tài giảng viên PR3", () => {
   beforeEach(() => push.mockClear());
 
   it("hiển thị bảng rỗng khi giảng viên chưa có đề tài", () => {
     renderList();
     expect(screen.getByRole("heading", { name: "Đề tài của tôi" })).toBeInTheDocument();
     expect(screen.getByText("Bạn chưa đăng đề tài nào")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Thêm đề tài" })).toBeDisabled();
+    expect(screen.getByRole("link", { name: "Thêm đề tài" })).toHaveAttribute("href", "/lecturer/topics/new");
   });
 
   it("phân biệt không có dữ liệu với không tìm thấy theo bộ lọc", () => {

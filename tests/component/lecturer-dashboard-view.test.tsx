@@ -11,9 +11,9 @@ describe("giao diện tổng quan giảng viên", () => {
     expect(screen.getAllByText("—")).toHaveLength(4);
   });
 
-  it("nút chức năng chưa triển khai phải bị vô hiệu hóa", () => {
+  it("nút Thêm đề tài dẫn đến form, liên kết đăng ký giữ nguyên", () => {
     render(<LecturerDashboardView />);
-    expect(screen.getByRole("button", { name: "Thêm đề tài" })).toBeDisabled();
+    expect(screen.getByRole("link", { name: "Thêm đề tài" })).toHaveAttribute("href", "/lecturer/topics/new");
     expect(screen.getByRole("link", { name: "Xem tất cả" })).toHaveAttribute("href", "/lecturer/registrations");
     expect(screen.getByRole("link", { name: "Chờ phản hồi" })).toHaveAttribute("href", "/lecturer/registrations?status=PENDING");
     expect(screen.getByRole("link", { name: "Đã nhận" })).toHaveAttribute("href", "/lecturer/registrations?status=ACCEPTED");

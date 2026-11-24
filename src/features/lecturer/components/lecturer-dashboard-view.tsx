@@ -20,9 +20,8 @@ export function LecturerDashboardView() {
         title="Tổng quan"
         description="Tình hình đề tài và đăng ký của bạn."
         actions={
-          <Button disabled title="Giao diện tạo đề tài sẽ được bổ sung ở PR riêng">
-            <PlusIcon aria-hidden="true" />
-            Thêm đề tài
+          <Button asChild>
+            <Link href="/lecturer/topics/new"><PlusIcon aria-hidden="true" /> Thêm đề tài</Link>
           </Button>
         }
       />
