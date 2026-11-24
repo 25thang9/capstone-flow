@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { FilePlusIcon, PlusIcon, SearchIcon, SearchXIcon } from "lucide-react";
 
+import { ActionButton } from "@/components/shared/action-button";
+import { ConfirmAction } from "@/components/shared/confirm-action";
+import { deleteTopicAction, setTopicStatusAction } from "@/features/lecturer/topics/actions";
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterForm } from "@/components/shared/filter-form";
 import { PageHeader } from "@/components/shared/page-header";
@@ -26,7 +29,7 @@ export type LecturerTopicsViewProps = {
   pagination: Pagination;
 };
 
-/** Trang đề tài: PR3 mở chức năng tạo mới; sửa/xóa/đóng mở tiếp tục ở PR4. */
+/** Danh sách có đầy đủ thao tác quản lý đề tài của giảng viên (PR4). */
 export function LecturerTopicsView({ filters, topics, pagination }: LecturerTopicsViewProps) {
   const filtering = Boolean(filters.q) || filters.status !== "ALL";
 
@@ -104,7 +107,36 @@ export function LecturerTopicsView({ filters, topics, pagination }: LecturerTopi
                   <TableCell className="text-right tabular-nums">{topic.acceptedCount}/{topic.maxStudents}</TableCell>
                   <TableCell className="text-right tabular-nums">{topic.pendingCount}</TableCell>
                   <TableCell>{formatDate(topic.updatedAt)}</TableCell>
-                  <TableCell><Button type="button" size="sm" variant="outline" disabled title="Chỉnh sửa ở PR tiếp theo">Sửa</Button></TableCell>
+                  <TableCell>
+                    <div className="flex justify-end gap-1">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/lecturer/topics/${topic.id}/edit`}>Sửa</Link>
+                      </Button>
+                      <ActionButton
+                        variant="ghost"
+                        size="sm"
+                        action={setTopicStatusAction.bind(null, topic.id, topic.status === "OPEN" ? "CLOSED" : "OPEN")}
+                      >
+                        {topic.status === "OPEN" ? "Đóng" : "Mở lại"}
+                      </ActionButton>
+                      <ConfirmAction
+                        trigger={
+                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                            Xóa
+                          </Button>
+                        }
+                        title="Xóa đề tài này?"
+                        description={
+                          topic.registrationCount > 0
+                            ? `“${topic.title}” đang có ${topic.registrationCount} lượt đăng ký; nếu chưa nhận sinh viên, các đăng ký này sẽ bị xóa theo và không khôi phục được.`
+                            : `“${topic.title}” sẽ bị xóa vĩnh viễn.`
+                        }
+                        confirmLabel="Xóa đề tài"
+                        destructive
+                        action={deleteTopicAction.bind(null, topic.id)}
+                      />
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -8,6 +8,11 @@ import type { LecturerTopicRow } from "@/features/lecturer/topics/queries";
 
 const push = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+// Component test: không gọi Server Actions hoặc truy cập Neon.
+vi.mock("@/features/lecturer/topics/actions", () => ({
+  setTopicStatusAction: vi.fn(),
+  deleteTopicAction: vi.fn(),
+}));
 
 const defaults: LecturerTopicFilters = { q: "", status: "ALL", page: 1 };
 const topic: LecturerTopicRow = {
@@ -19,6 +24,7 @@ const topic: LecturerTopicRow = {
   department: { name: "Vật lý ứng dụng" },
   acceptedCount: 1,
   pendingCount: 2,
+  registrationCount: 3,
 };
 
 function renderList(options?: { topics?: LecturerTopicRow[]; filters?: LecturerTopicFilters }) {
@@ -26,7 +32,7 @@ function renderList(options?: { topics?: LecturerTopicRow[]; filters?: LecturerT
   render(<LecturerTopicsView filters={options?.filters ?? defaults} topics={topics} pagination={paginate(topics.length, 1, 10)} />);
 }
 
-describe("danh sách đề tài giảng viên PR3", () => {
+describe("danh sách đề tài giảng viên PR4", () => {
   beforeEach(() => push.mockClear());
 
   it("hiển thị bảng rỗng khi giảng viên chưa có đề tài", () => {
@@ -47,7 +53,14 @@ describe("danh sách đề tài giảng viên PR3", () => {
     expect(screen.getByText("Vật lý ứng dụng")).toBeInTheDocument();
     expect(screen.getByText("1/3")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Sửa" })).toBeDisabled();
+    expect(screen.getByRole("link", { name: "Sửa" })).toHaveAttribute("href", "/lecturer/topics/t1/edit");
+    expect(screen.getByRole("button", { name: "Đóng" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Xóa" })).toBeEnabled();
+  });
+
+  it("đề tài đóng có nút Mở lại", () => {
+    renderList({ topics: [{ ...topic, status: "CLOSED" }] });
+    expect(screen.getByRole("button", { name: "Mở lại" })).toBeEnabled();
   });
 
   it("nhập bộ lọc, nhấn Lọc sẽ chuyển URL đúng", () => {
