@@ -38,9 +38,31 @@ export async function listMyTopics(filters: LecturerTopicFilters, pageSize = 10)
     ...topic,
     acceptedCount: registrations.filter((item) => item.status === "ACCEPTED").length,
     pendingCount: registrations.filter((item) => item.status === "PENDING").length,
+    registrationCount: registrations.length,
   }));
 
   return { topics, pagination };
 }
 
 export type LecturerTopicRow = Awaited<ReturnType<typeof listMyTopics>>["topics"][number];
+
+
+/** Chỉ tải đề tài thuộc giảng viên hiện tại để điền form sửa; id người khác → null. */
+export async function getMyTopic(id: string) {
+  const user = await requireRole("LECTURER");
+  return prisma.topic.findFirst({
+    where: { id, lecturerId: user.id },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      objectives: true,
+      requirements: true,
+      maxStudents: true,
+      status: true,
+      departmentId: true,
+      tags: { select: { id: true } },
+      _count: { select: { registrations: { where: { status: "ACCEPTED" } } } },
+    },
+  });
+}
