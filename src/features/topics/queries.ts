@@ -79,6 +79,21 @@ export async function getPublicTopic(id: string): Promise<TopicDetailData | null
   });
 }
 
+export async function listTopPublicTags(limit = 3) {
+  const tags = await prisma.tag.findMany({
+    where: { topics: { some: { status: "OPEN" } } },
+    select: {
+      name: true,
+      slug: true,
+      _count: { select: { topics: { where: { status: "OPEN" } } } },
+    },
+  });
+  return tags
+    .sort((first, second) => second._count.topics - first._count.topics || first.name.localeCompare(second.name, "vi"))
+    .slice(0, limit)
+    .map(({ name, slug }) => ({ name, slug }));
+}
+
 export async function listLatestOpenTopics(take: number) {
   return prisma.topic.findMany({
     where: { status: "OPEN" },

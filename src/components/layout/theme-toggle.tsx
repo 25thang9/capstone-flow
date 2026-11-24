@@ -5,16 +5,18 @@ import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 
-export function ThemeToggle() {
+export function ThemeToggle({ fullWidth = false }: { fullWidth?: boolean }) {
   const { resolvedTheme, setTheme } = useTheme();
 
   return (
     <Button
       variant="ghost"
-      size="icon"
+      size={fullWidth ? "default" : "icon"}
+      className={fullWidth ? "h-11 w-full justify-between px-3" : undefined}
       aria-label="Đổi chế độ sáng / tối"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
+      {fullWidth ? <span>Giao diện</span> : null}
       <SunIcon className="hidden dark:block" aria-hidden="true" />
       <MoonIcon className="dark:hidden" aria-hidden="true" />
     </Button>
