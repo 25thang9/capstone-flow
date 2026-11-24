@@ -1,25 +1,59 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LecturerTopicsView } from "@/features/lecturer/components/lecturer-topics-view";
+import { paginate } from "@/lib/pagination";
+import type { LecturerTopicFilters } from "@/features/lecturer/topics/filters";
+import type { LecturerTopicRow } from "@/features/lecturer/topics/queries";
 
-describe("giao diện đề tài giảng viên", () => {
-  it("hiện đúng cột của bảng B3 và trạng thái chưa kết nối dữ liệu", () => {
-    render(<LecturerTopicsView />);
+const push = vi.fn();
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+
+const defaults: LecturerTopicFilters = { q: "", status: "ALL", page: 1 };
+const topic: LecturerTopicRow = {
+  id: "t1",
+  title: "Robot vận chuyển thuốc",
+  status: "OPEN",
+  maxStudents: 3,
+  updatedAt: new Date("2026-11-20T00:00:00Z"),
+  department: { name: "Vật lý ứng dụng" },
+  acceptedCount: 1,
+  pendingCount: 2,
+};
+
+function renderList(options?: { topics?: LecturerTopicRow[]; filters?: LecturerTopicFilters }) {
+  const topics = options?.topics ?? [];
+  render(<LecturerTopicsView filters={options?.filters ?? defaults} topics={topics} pagination={paginate(topics.length, 1, 10)} />);
+}
+
+describe("danh sách đề tài giảng viên PR2", () => {
+  beforeEach(() => push.mockClear());
+
+  it("hiển thị bảng rỗng khi giảng viên chưa có đề tài", () => {
+    renderList();
     expect(screen.getByRole("heading", { name: "Đề tài của tôi" })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "Đã nhận" })).toBeInTheDocument();
-    expect(screen.getByText("Chưa kết nối danh sách đề tài")).toBeInTheDocument();
+    expect(screen.getByText("Bạn chưa đăng đề tài nào")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Thêm đề tài" })).toBeDisabled();
   });
 
-  it("lọc và xóa bộ lọc chỉ thay đổi trạng thái giao diện", () => {
-    render(<LecturerTopicsView />);
-    fireEvent.change(screen.getByRole("searchbox", { name: "Tìm theo tên đề tài" }), { target: { value: "  ESP32  " } });
-    fireEvent.change(screen.getByRole("combobox", { name: "Trạng thái" }), { target: { value: "CLOSED" } });
+  it("phân biệt không có dữ liệu với không tìm thấy theo bộ lọc", () => {
+    renderList({ filters: { q: "không tồn tại", status: "ALL", page: 1 } });
+    expect(screen.getByText("Không có đề tài khớp bộ lọc")).toBeInTheDocument();
+  });
+
+  it("hiển thị đề tài, trạng thái, số sinh viên và bộ môn", () => {
+    renderList({ topics: [topic] });
+    expect(screen.getByText("Robot vận chuyển thuốc")).toBeInTheDocument();
+    expect(screen.getByText("Vật lý ứng dụng")).toBeInTheDocument();
+    expect(screen.getByText("1/3")).toBeInTheDocument();
+    expect(screen.getByText("2")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sửa" })).toBeDisabled();
+  });
+
+  it("nhập bộ lọc, nhấn Lọc sẽ chuyển URL đúng", () => {
+    renderList();
+    fireEvent.change(screen.getByRole("searchbox", { name: "Tìm theo tên đề tài" }), { target: { value: "ESP32" } });
     fireEvent.click(screen.getByRole("button", { name: "Lọc" }));
-    expect(screen.getByText(/Đã chọn bộ lọc: ESP32 · Đã đóng/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Xóa bộ lọc" }));
-    expect(screen.getByRole("searchbox", { name: "Tìm theo tên đề tài" })).toHaveValue("");
-    expect(screen.getByText(/Đang xem tất cả trạng thái/)).toBeInTheDocument();
+    expect(push).toHaveBeenCalledWith("/lecturer/topics?q=ESP32");
   });
 });
