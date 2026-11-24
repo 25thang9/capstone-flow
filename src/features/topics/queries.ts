@@ -63,6 +63,22 @@ export async function listTopicFilterOptions() {
   ]);
   return { departments, tags };
 }
+const topicDetailSelect = {
+  ...topicCardSelect,
+  objectives: true,
+  requirements: true,
+  lecturerId: true,
+} satisfies Prisma.TopicSelect;
+
+export type TopicDetailData = Prisma.TopicGetPayload<{ select: typeof topicDetailSelect }>;
+
+export async function getPublicTopic(id: string): Promise<TopicDetailData | null> {
+  return prisma.topic.findUnique({
+    where: { id },
+    select: topicDetailSelect,
+  });
+}
+
 export async function listLatestOpenTopics(take: number) {
   return prisma.topic.findMany({
     where: { status: "OPEN" },
