@@ -76,4 +76,4 @@ tests/                 unit/ · component/
 - [x] **Giai đoạn 2** – Giao diện chung, đăng nhập / đăng ký, trang giới thiệu
 - [x] **Giai đoạn 3** – Trang chủ công khai và hiện danh sách đề tài, bộ môn
 - [x] **Giai đoạn 4** – Kho đề tài: tìm kiếm, lọc, phân trang
-- [ ] Giai đoạn 5 – Chi tiết đề tài, E2E test, CI
+- [x] **Giai đoạn 5** – Chi tiết đề tài
