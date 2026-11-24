@@ -1,38 +1,34 @@
-"use client";
-
-import { useState, type FormEvent } from "react";
-import { FilePlusIcon, PlusIcon, SearchIcon } from "lucide-react";
+import Link from "next/link";
+import { FilePlusIcon, PlusIcon, SearchIcon, SearchXIcon } from "lucide-react";
 
 import { EmptyState } from "@/components/shared/empty-state";
+import { FilterForm } from "@/components/shared/filter-form";
 import { PageHeader } from "@/components/shared/page-header";
+import { PaginationNav } from "@/components/shared/pagination-nav";
+import { AvailabilityBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { getAvailability } from "@/features/registrations/rules";
 import {
-  isTopicFilterActive,
-  normalizeKeyword,
-  normalizeTopicStatus,
-  type TopicStatusFilter,
-} from "@/features/lecturer/ui-filters";
+  lecturerTopicFilterParams,
+  type LecturerTopicFilters,
+} from "@/features/lecturer/topics/filters";
+import type { LecturerTopicRow } from "@/features/lecturer/topics/queries";
+import type { Pagination } from "@/lib/pagination";
+import { formatDate } from "@/lib/text";
 
-export function LecturerTopicsView() {
-  const [draftKeyword, setDraftKeyword] = useState("");
-  const [draftStatus, setDraftStatus] = useState<TopicStatusFilter>("ALL");
-  const [filters, setFilters] = useState({ q: "", status: "ALL" as TopicStatusFilter });
-  const filtering = isTopicFilterActive(filters.q, filters.status);
+export type LecturerTopicsViewProps = {
+  filters: LecturerTopicFilters;
+  topics: LecturerTopicRow[];
+  pagination: Pagination;
+};
 
-  function onFilter(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setFilters({ q: normalizeKeyword(draftKeyword), status: normalizeTopicStatus(draftStatus) });
-  }
-
-  function resetFilters() {
-    setDraftKeyword("");
-    setDraftStatus("ALL");
-    setFilters({ q: "", status: "ALL" });
-  }
+/** Giao diện bảng B3, chưa bật các thao tác thay đổi đề tài (PR riêng). */
+export function LecturerTopicsView({ filters, topics, pagination }: LecturerTopicsViewProps) {
+  const filtering = Boolean(filters.q) || filters.status !== "ALL";
 
   return (
     <>
@@ -40,57 +36,87 @@ export function LecturerTopicsView() {
         title="Đề tài của tôi"
         description="Bạn chỉ thấy và chỉ sửa được đề tài do chính mình đăng."
         actions={
-          <Button disabled title="Chức năng thêm đề tài sẽ được thực hiện ở PR riêng">
+          <Button disabled title="Chức năng thêm đề tài sẽ được thực hiện trong PR tiếp theo">
             <PlusIcon aria-hidden="true" /> Thêm đề tài
           </Button>
         }
       />
-      <form onSubmit={onFilter} className="flex flex-wrap items-end gap-3" aria-label="Lọc đề tài giảng viên">
+
+      <FilterForm
+        pathname="/lecturer/topics"
+        defaults={{ status: "ALL" }}
+        className="flex flex-wrap items-end gap-3"
+      >
         <div className="grid min-w-56 flex-1 gap-1.5 sm:max-w-sm">
           <Label htmlFor="lecturer-topic-q">Tìm theo tên đề tài</Label>
-          <Input id="lecturer-topic-q" type="search" value={draftKeyword} maxLength={100} onChange={(e) => setDraftKeyword(e.target.value)} />
+          <Input id="lecturer-topic-q" name="q" type="search" defaultValue={filters.q} maxLength={100} />
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="lecturer-topic-status">Trạng thái</Label>
-          <NativeSelect id="lecturer-topic-status" value={draftStatus} onChange={(e) => setDraftStatus(normalizeTopicStatus(e.target.value))}>
+          <NativeSelect id="lecturer-topic-status" name="status" defaultValue={filters.status}>
             <NativeSelectOption value="ALL">Tất cả</NativeSelectOption>
             <NativeSelectOption value="OPEN">Đang nhận</NativeSelectOption>
             <NativeSelectOption value="CLOSED">Đã đóng</NativeSelectOption>
           </NativeSelect>
         </div>
         <Button type="submit" variant="outline"><SearchIcon aria-hidden="true" /> Lọc</Button>
-        <Button type="button" variant="ghost" onClick={resetFilters}>Xóa bộ lọc</Button>
-      </form>
+        <Button asChild type="button" variant="ghost">
+          <Link href="/lecturer/topics">Xóa bộ lọc</Link>
+        </Button>
+      </FilterForm>
       <p className="mt-3 text-xs text-muted-foreground" aria-live="polite">
-        {filtering ? `Đã chọn bộ lọc: ${filters.q || "mọi tên đề tài"} · ${filters.status === "OPEN" ? "Đang nhận" : filters.status === "CLOSED" ? "Đã đóng" : "Tất cả trạng thái"}.` : "Đang xem tất cả trạng thái."}
-        {" "}Bộ lọc chỉ hoạt động trên giao diện, chưa truy vấn dữ liệu.
+        {filtering ? "Đang hiển thị kết quả theo bộ lọc đã chọn." : "Đang xem tất cả đề tài của bạn."}
       </p>
 
-      <div className="mt-6 overflow-x-auto rounded-lg border bg-card">
-        <Table className="min-w-[46rem]">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Đề tài</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead className="text-right">Đã nhận</TableHead>
-              <TableHead className="text-right">Đang chờ</TableHead>
-              <TableHead>Cập nhật</TableHead>
-              <TableHead><span className="sr-only">Thao tác</span></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={6} className="whitespace-normal p-6">
-                <EmptyState
-                  icon={FilePlusIcon}
-                  title="Chưa kết nối danh sách đề tài"
-                  description="Bảng và các thao tác quản lý sẽ dùng dữ liệu thật ở PR chức năng sau."
-                />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
+      {topics.length === 0 ? (
+        <div className="mt-6">
+          <EmptyState
+            icon={filtering ? SearchXIcon : FilePlusIcon}
+            title={filtering ? "Không có đề tài khớp bộ lọc" : "Bạn chưa đăng đề tài nào"}
+            description={filtering
+              ? "Thử thay đổi từ khóa hoặc trạng thái để tìm đề tài khác."
+              : "Danh sách sẽ hiển thị khi tài khoản giảng viên có đề tài được tạo."}
+          />
+        </div>
+      ) : (
+        <div className="mt-6 overflow-x-auto rounded-lg border bg-card">
+          <Table className="min-w-[46rem]">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Đề tài</TableHead>
+                <TableHead>Trạng thái</TableHead>
+                <TableHead className="text-right">Đã nhận</TableHead>
+                <TableHead className="text-right">Đang chờ</TableHead>
+                <TableHead>Cập nhật</TableHead>
+                <TableHead><span className="sr-only">Thao tác</span></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {topics.map((topic) => (
+                <TableRow key={topic.id}>
+                  <TableCell className="max-w-sm whitespace-normal">
+                    <p className="font-medium">{topic.title}</p>
+                    <p className="text-xs text-muted-foreground">{topic.department.name}</p>
+                  </TableCell>
+                  <TableCell>
+                    <AvailabilityBadge availability={getAvailability(topic)} />
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">{topic.acceptedCount}/{topic.maxStudents}</TableCell>
+                  <TableCell className="text-right tabular-nums">{topic.pendingCount}</TableCell>
+                  <TableCell>{formatDate(topic.updatedAt)}</TableCell>
+                  <TableCell><Button type="button" size="sm" variant="outline" disabled title="Chỉnh sửa ở PR tiếp theo">Sửa</Button></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      <PaginationNav
+        pagination={pagination}
+        pathname="/lecturer/topics"
+        params={lecturerTopicFilterParams(filters)}
+      />
     </>
   );
 }
