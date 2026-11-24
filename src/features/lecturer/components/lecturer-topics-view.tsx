@@ -26,7 +26,7 @@ export type LecturerTopicsViewProps = {
   pagination: Pagination;
 };
 
-/** Giao diện bảng B3, chưa bật các thao tác thay đổi đề tài (PR riêng). */
+/** Trang đề tài: PR3 mở chức năng tạo mới; sửa/xóa/đóng mở tiếp tục ở PR4. */
 export function LecturerTopicsView({ filters, topics, pagination }: LecturerTopicsViewProps) {
   const filtering = Boolean(filters.q) || filters.status !== "ALL";
 
@@ -36,8 +36,8 @@ export function LecturerTopicsView({ filters, topics, pagination }: LecturerTopi
         title="Đề tài của tôi"
         description="Bạn chỉ thấy và chỉ sửa được đề tài do chính mình đăng."
         actions={
-          <Button disabled title="Chức năng thêm đề tài sẽ được thực hiện trong PR tiếp theo">
-            <PlusIcon aria-hidden="true" /> Thêm đề tài
+          <Button asChild>
+            <Link href="/lecturer/topics/new"><PlusIcon aria-hidden="true" /> Thêm đề tài</Link>
           </Button>
         }
       />
