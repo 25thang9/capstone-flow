@@ -53,7 +53,9 @@ Nhật ký ghi nhận quá trình sử dụng AI trong việc phát triển và 
 
 | Ngày | Công cụ | Việc nhờ AI | Prompt (tóm tắt) | Kết quả dùng thế nào | Đã tự kiểm chứng / sửa gì | Commit/PR |
 |---|---|---|---|---|---|---|
-| YYYY-MM-DD | — | — | — | — | — | — |
+
+| 2026-11-25 | ChatGPT | Hỗ trợ xây dựng trang Tổng quan dành cho Quản trị khoa (ADMIN), thiết lập layout điều hướng, truy vấn thống kê Prisma, biểu đồ đề tài theo bộ môn và kiểm tra quyền truy cập. | "Hướng dẫn từng bước tạo trang Tổng quan Quản trị khoa bằng Next.js 16, TypeScript, Prisma và Neon. Chỉ tạo file mới thuộc phạm vi ADMIN, không chỉnh sửa chức năng của thành viên khác." | Tự tạo 4 file trong VS Code: `src/app/admin/layout.tsx`, `src/app/admin/page.tsx`, `src/features/admin/queries.ts`, `src/features/admin/components/topics-by-department-chart.tsx`. Hoàn thiện 4 thẻ thống kê, biểu đồ đề tài theo bộ môn và thống kê đăng ký theo trạng thái; sử dụng `requireRole("ADMIN")` ở truy vấn thống kê. | Kiểm tra code trong VS Code; kết nối Neon, chạy trang `/admin` trên localhost và đối chiếu số liệu. `npm run lint` đạt, `npm run typecheck` đạt, Vitest 21 file với 102/102 tests đạt, `npm run build` thành công. Kiểm tra Chrome ẩn danh không còn lỗi Hydration Mismatch. | Commit `3542688` / PR #13 (chưa merge) |
+
 
 ### Tự đánh giá cuối bài
 
