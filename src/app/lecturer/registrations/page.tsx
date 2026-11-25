@@ -1,28 +1,29 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { LecturerRegistrationsView } from "@/features/lecturer/components/lecturer-registrations-view";
-import { normalizeRegistrationStatus } from "@/features/lecturer/ui-filters";
-import { requireRole } from "@/lib/dal";
+import { parseRegistrationFilters } from "@/features/lecturer/registrations/filters";
+import {
+  listMyTopicOptions, listRegistrationsForMyTopics,
+} from "@/features/lecturer/registrations/queries";
 
 export const metadata: Metadata = { title: "Sinh viên đăng ký" };
 
-export default function LecturerRegistrationsPage({ searchParams }: PageProps<"/lecturer/registrations">) {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default function LecturerRegistrationsPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-      <ProtectedRegistrations searchParams={searchParams} />
+      <RegistrationsContent searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function ProtectedRegistrations({
-  searchParams,
-}: Pick<PageProps<"/lecturer/registrations">, "searchParams">) {
-  await requireRole("LECTURER");
-  const params = await searchParams;
-  const initialStatus = normalizeRegistrationStatus(
-    typeof params.status === "string" ? params.status : "ALL",
-  );
-  return <LecturerRegistrationsView initialStatus={initialStatus} />;
+async function RegistrationsContent({ searchParams }: { searchParams: SearchParams }) {
+  const filters = parseRegistrationFilters(await searchParams);
+  const [{ registrations, pagination }, topics] = await Promise.all([
+    listRegistrationsForMyTopics(filters),
+    listMyTopicOptions(),
+  ]);
+  return <LecturerRegistrationsView filters={filters} registrations={registrations} pagination={pagination} topics={topics} />;
 }

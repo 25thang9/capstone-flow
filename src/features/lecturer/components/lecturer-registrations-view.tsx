@@ -1,112 +1,156 @@
-"use client";
-
-import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { DownloadIcon, InboxIcon, SearchIcon } from "lucide-react";
 
 import { EmptyState } from "@/components/shared/empty-state";
+import { FilterForm } from "@/components/shared/filter-form";
 import { PageHeader } from "@/components/shared/page-header";
+import { PaginationNav } from "@/components/shared/pagination-nav";
+import { RegistrationStatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  isRegistrationFilterActive,
-  normalizeKeyword,
-  normalizeRegistrationStatus,
-  type RegistrationStatusFilter,
-} from "@/features/lecturer/ui-filters";
+import { RespondDialog } from "@/features/lecturer/components/respond-registration-dialog";
+import { registrationFilterParams, type RegistrationFilters } from "@/features/lecturer/registrations/filters";
+import type { LecturerRegistration } from "@/features/lecturer/registrations/queries";
+import { REGISTRATION_STATUS_LABEL } from "@/lib/labels";
+import { type Pagination, buildHref } from "@/lib/pagination";
+import { formatDateTime } from "@/lib/text";
+import { cn } from "@/lib/utils";
 
-const statusTabs: { value: RegistrationStatusFilter; label: string }[] = [
+const STATUS_TABS = [
   { value: "ALL", label: "Tất cả" },
-  { value: "PENDING", label: "Chờ phản hồi" },
-  { value: "ACCEPTED", label: "Đã nhận" },
-  { value: "REJECTED", label: "Từ chối" },
-];
+  { value: "PENDING", label: REGISTRATION_STATUS_LABEL.PENDING },
+  { value: "ACCEPTED", label: REGISTRATION_STATUS_LABEL.ACCEPTED },
+  { value: "REJECTED", label: REGISTRATION_STATUS_LABEL.REJECTED },
+] as const;
 
-export function LecturerRegistrationsView({ initialStatus = "ALL" }: { initialStatus?: RegistrationStatusFilter }) {
-  const [status, setStatus] = useState<RegistrationStatusFilter>(initialStatus);
-  const [draftKeyword, setDraftKeyword] = useState("");
-  const [keyword, setKeyword] = useState("");
+type Props = {
+  filters: RegistrationFilters;
+  topics: { id: string; title: string }[];
+  registrations: LecturerRegistration[];
+  pagination: Pagination;
+};
 
-  function onFilter(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setKeyword(normalizeKeyword(draftKeyword));
-  }
-
-  function resetFilters() {
-    setStatus("ALL");
-    setDraftKeyword("");
-    setKeyword("");
-  }
-
+/** B3: bộ lọc qua URL, danh sách có thông tin liên hệ chỉ dành cho chủ đề tài. */
+export function LecturerRegistrationsView({ filters, topics, registrations, pagination }: Props) {
+  const params = registrationFilterParams(filters);
   return (
     <>
       <PageHeader
         title="Sinh viên đăng ký"
         description="Thông tin liên hệ chỉ hiển thị cho giảng viên sở hữu đề tài."
-        actions={
-          <Button disabled variant="outline" title="Xuất CSV sẽ được bổ sung ở PR xử lý đăng ký">
-            <DownloadIcon aria-hidden="true" /> Xuất CSV
+        actions={pagination.total > 0 ? (
+          <Button asChild variant="outline">
+            <a href={buildHref("/api/lecturer/registrations/export", { ...params, page: 1 })} download>
+              <DownloadIcon aria-hidden="true" /> Xuất CSV
+            </a>
           </Button>
-        }
+        ) : undefined}
       />
-      <nav aria-label="Lọc theo trạng thái" className="flex flex-wrap gap-1.5">
-        {statusTabs.map((tab) => (
-          <button
-            type="button"
-            key={tab.value}
-            onClick={() => setStatus(normalizeRegistrationStatus(tab.value))}
-            aria-pressed={status === tab.value}
-            className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${status === tab.value ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
-      <form onSubmit={onFilter} className="mt-4 flex flex-wrap items-end gap-3" aria-label="Lọc đăng ký giảng viên">
-        <div className="grid min-w-56 flex-1 gap-1.5 sm:max-w-sm">
-          <Label htmlFor="lecturer-registration-q">Tìm sinh viên hoặc mã số</Label>
-          <Input id="lecturer-registration-q" type="search" value={draftKeyword} maxLength={100} onChange={(e) => setDraftKeyword(e.target.value)} />
-        </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="lecturer-registration-topic">Đề tài</Label>
-          <NativeSelect id="lecturer-registration-topic" disabled value="" aria-label="Đề tài (chưa kết nối dữ liệu)">
-            <NativeSelectOption value="">Tất cả đề tài</NativeSelectOption>
-          </NativeSelect>
-        </div>
-        <Button type="submit" variant="outline"><SearchIcon aria-hidden="true" /> Lọc</Button>
-        <Button type="button" variant="ghost" onClick={resetFilters}>Xóa bộ lọc</Button>
-      </form>
-      <p className="mt-3 text-xs text-muted-foreground" aria-live="polite">
-        {isRegistrationFilterActive(keyword, status) ? `Đã chọn bộ lọc: ${keyword || "mọi sinh viên"} · ${statusTabs.find((tab) => tab.value === status)?.label}.` : "Đang xem tất cả trạng thái."}
-        {" "}Bộ lọc chỉ hoạt động trên giao diện, chưa truy vấn dữ liệu.
-      </p>
 
-      <div className="mt-6 overflow-x-auto rounded-lg border bg-card">
-        <Table className="min-w-[44rem]">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Sinh viên</TableHead>
-              <TableHead>Đề tài</TableHead>
-              <TableHead>Thời gian</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead><span className="sr-only">Thao tác</span></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={5} className="whitespace-normal p-6">
-                <EmptyState
-                  icon={InboxIcon}
-                  title="Chưa kết nối danh sách đăng ký"
-                  description="Danh sách, phản hồi và xuất CSV sẽ được bổ sung ở PR chức năng sau."
-                />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      <nav aria-label="Lọc theo trạng thái" className="flex flex-wrap gap-1.5">
+        {STATUS_TABS.map((tab) => {
+          const active = filters.status === tab.value;
+          return (
+            <Link
+              key={tab.value}
+              href={buildHref("/lecturer/registrations", {
+                ...params, status: tab.value === "ALL" ? "" : tab.value, page: 1,
+              })}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "rounded-full border px-3 py-1 text-sm font-medium transition-colors",
+                active ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-muted",
+              )}
+            >{tab.label}</Link>
+          );
+        })}
+      </nav>
+
+      <div className="mt-4 flex flex-wrap items-end gap-3">
+        <FilterForm pathname="/lecturer/registrations" className="flex flex-wrap items-end gap-3">
+          {filters.status !== "ALL" ? <input type="hidden" name="status" value={filters.status} /> : null}
+          <div className="grid min-w-56 gap-1.5">
+            <Label htmlFor="lecturer-registration-q">Tìm sinh viên hoặc mã số</Label>
+            <Input
+              id="lecturer-registration-q" name="q" type="search"
+              defaultValue={filters.q} maxLength={100} className="w-64"
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="lecturer-registration-topic">Đề tài</Label>
+            <NativeSelect
+              id="lecturer-registration-topic" name="topic"
+              defaultValue={filters.topicId} className="max-w-72"
+            >
+              <NativeSelectOption value="">Tất cả đề tài</NativeSelectOption>
+              {topics.map((topic) => (
+                <NativeSelectOption key={topic.id} value={topic.id}>{topic.title}</NativeSelectOption>
+              ))}
+            </NativeSelect>
+          </div>
+          <Button type="submit" variant="outline"><SearchIcon aria-hidden="true" /> Lọc</Button>
+        </FilterForm>
+        <Button asChild variant="ghost"><Link href="/lecturer/registrations">Xóa bộ lọc</Link></Button>
       </div>
+
+      {registrations.length === 0 ? (
+        <div className="mt-6">
+          <EmptyState
+            icon={InboxIcon}
+            title="Không có đăng ký nào"
+            description="Chưa có sinh viên đăng ký, hoặc không có đăng ký nào khớp bộ lọc hiện tại."
+          />
+        </div>
+      ) : (
+        <ul className="mt-6 divide-y border-y">
+          {registrations.map((item) => (
+            <li key={item.id} className="grid gap-4 py-5 md:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <h2 className="font-sans text-base font-semibold">{item.student.name}</h2>
+                  <RegistrationStatusBadge status={item.status} />
+                </div>
+                <dl className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+                  <div className="flex gap-1.5">
+                    <dt className="text-muted-foreground">MSSV</dt>
+                    <dd className="tabular-nums">{item.studentCode}</dd>
+                  </div>
+                  {item.className ? <div className="flex gap-1.5"><dt className="text-muted-foreground">Lớp</dt><dd>{item.className}</dd></div> : null}
+                  <div className="flex gap-1.5">
+                    <dt className="text-muted-foreground">Email</dt>
+                    <dd><a href={`mailto:${item.student.email}`} className="text-link hover:underline">{item.student.email}</a></dd>
+                  </div>
+                  {item.phone ? <div className="flex gap-1.5"><dt className="text-muted-foreground">Điện thoại</dt><dd><a href={`tel:${item.phone}`} className="text-link hover:underline">{item.phone}</a></dd></div> : null}
+                </dl>
+                <p className="mt-2 text-sm">
+                  <span className="text-muted-foreground">Đề tài: </span>
+                  <Link href={`/lecturer/topics/${item.topic.id}/edit`} className="hover:text-link hover:underline">{item.topic.title}</Link>
+                </p>
+                {item.message ? <p className="user-text mt-3 rounded-md bg-muted px-3 py-2 text-sm">{item.message}</p> : null}
+                {item.lecturerNote ? (
+                  <p className="user-text mt-3 border-l-2 border-primary pl-3 text-sm">
+                    <span className="block text-xs text-muted-foreground">Phản hồi của bạn</span>
+                    {item.lecturerNote}
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex items-center justify-between gap-3 md:flex-col md:items-end md:justify-start">
+                <time dateTime={item.createdAt.toISOString()} className="text-xs text-muted-foreground">
+                  {formatDateTime(item.createdAt)}
+                </time>
+                <RespondDialog registration={{
+                  id: item.id, status: item.status, lecturerNote: item.lecturerNote,
+                  studentName: item.student.name, topicTitle: item.topic.title,
+                }} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <PaginationNav pagination={pagination} pathname="/lecturer/registrations" params={params} />
     </>
   );
 }
