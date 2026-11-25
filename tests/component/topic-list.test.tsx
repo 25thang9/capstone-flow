@@ -52,4 +52,14 @@ describe("TopicList", () => {
     render(<TopicList topics={[makeTopic({ status: "CLOSED" })]} />);
     expect(screen.getByText("Đã đóng")).toBeInTheDocument();
   });
+
+  it("chế độ cards hiển thị dạng thẻ nổi bật có đầy đủ liên kết và chỉ tiêu", () => {
+    render(<TopicList topics={[makeTopic()]} layout="cards" />);
+    const list = screen.getByRole("list", { name: "Đề tài nổi bật" });
+    expect(within(list).getByRole("link", { name: "Hệ đo nhiệt độ dùng ESP32" })).toHaveAttribute(
+      "href",
+      "/topics/topic-1",
+    );
+    expect(within(list).getByText("1/3")).toBeInTheDocument();
+  });
 });

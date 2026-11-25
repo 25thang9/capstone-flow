@@ -4,6 +4,7 @@ import { useActionState, useRef } from "react";
 
 import { FormField, controlProps } from "@/components/shared/form-field";
 import { FormError, fieldState, useFocusFirstInvalid } from "@/components/shared/form-helpers";
+import { PasswordInput } from "@/components/shared/password-input";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -35,9 +36,8 @@ export function SignInForm({ next }: { next?: string }) {
         </FormField>
 
         <FormField id="password" label="Mật khẩu" required error={password.error}>
-          <Input
+          <PasswordInput
             name="password"
-            type="password"
             autoComplete="current-password"
             {...controlProps("password", { error: password.error, required: true })}
           />
@@ -88,18 +88,16 @@ export function SignUpForm({ next }: { next?: string }) {
         </FormField>
 
         <FormField id="password" label="Mật khẩu" required error={password.error} hint={passwordHint}>
-          <Input
+          <PasswordInput
             name="password"
-            type="password"
             autoComplete="new-password"
             {...controlProps("password", { error: password.error, hint: passwordHint, required: true })}
           />
         </FormField>
 
         <FormField id="confirmPassword" label="Nhập lại mật khẩu" required error={confirmPassword.error}>
-          <Input
+          <PasswordInput
             name="confirmPassword"
-            type="password"
             autoComplete="new-password"
             {...controlProps("confirmPassword", { error: confirmPassword.error, required: true })}
           />
